@@ -1,0 +1,39 @@
+# Environment — never commit real keys
+.env
+
+# Virtual environment
+.venv/
+
+# Hidden direcories in general - generated or system specific
+.*/
+
+# Un-ignored hidden directories - Git
+!.git/
+!.github/
+
+# Logs
+logs/
+
+# ChromaDB — generated, rebuilt by running the loader
+data/chroma_db/
+
+# Eval outputs — generated artifacts, not source
+results/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store

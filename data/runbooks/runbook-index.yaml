@@ -1,0 +1,203 @@
+runbooks:
+  # Compute / Pods
+  - file: compute-high-cpu.md
+    title: "High CPU Usage — Pod or Node"
+    family: compute
+    severity: high
+    tags: [cpu, throttling, hpa, scaling]
+    description: "Pod or node CPU saturation above threshold; covers throttling, traffic spikes, and GC pressure."
+
+  - file: compute-oom-killed.md
+    title: "OOMKilled — Container Killed by Out-of-Memory"
+    family: compute
+    severity: critical
+    tags: [oom, memory, limit, leak]
+    description: "Container killed by the kernel OOM killer; covers memory leaks, limit under-provisioning, and large payload spikes."
+
+  - file: compute-crashloop.md
+    title: "CrashLoopBackOff — Container Repeatedly Crashing"
+    family: compute
+    severity: critical
+    tags: [crashloop, restart, startup, liveness-probe]
+    description: "Container crashes repeatedly; covers OOMKill, startup errors, misconfigured probes, and missing secrets."
+
+  - file: compute-node-not-ready.md
+    title: "Node NotReady — Node Drops Out of Ready State"
+    family: compute
+    severity: critical
+    tags: [node, kubelet, disk-pressure, cloud-instance]
+    description: "Node stops reporting heartbeat; covers kubelet crash, disk pressure, cloud instance events, and network partition."
+
+  - file: compute-resource-quota-exceeded.md
+    title: "Resource Quota Exceeded — Namespace Quota Blocks Scheduling"
+    family: compute
+    severity: high
+    tags: [quota, namespace, scheduling, hpa]
+    description: "Namespace quota prevents pod creation; covers under-provisioned quota, HPA scale-out, and zombie pods."
+
+  - file: compute-pending-pods.md
+    title: "Pods Stuck in Pending — Scheduling Failure"
+    family: compute
+    severity: high
+    tags: [pending, scheduling, affinity, taint, gpu, pvc]
+    description: "Pods accepted but not placed on any node; covers resource shortage, affinity/taint constraints, and PVC binding."
+
+  # Storage / Disk
+  - file: storage-disk-pressure.md
+    title: "Disk Pressure — Node Disk or Inode Exhaustion"
+    family: storage
+    severity: high
+    tags: [disk, inode, log, eviction, node]
+    description: "Node disk/inode below eviction threshold; covers log accumulation, image bloat, coredumps, and kubelet eviction."
+
+  - file: storage-pvc-mount-failure.md
+    title: "PVC Mount Failure — PersistentVolumeClaim Fails to Mount"
+    family: storage
+    severity: high
+    tags: [pvc, volume, csi, mount, stateful]
+    description: "PVC cannot attach or mount; covers stale VolumeAttachment, CSI driver failure, and PVC stuck Terminating."
+
+  - file: storage-etcd-disk.md
+    title: "etcd Disk Pressure — Disk Latency or Space on Control Plane"
+    family: storage
+    severity: critical
+    tags: [etcd, control-plane, fsync, disk, defragmentation]
+    description: "etcd disk latency or space exhaustion; covers fsync latency, DB quota, defragmentation, and quorum loss."
+
+  - file: storage-log-volume-full.md
+    title: "Log Volume Full — Container Filesystem Filled by Logs"
+    family: storage
+    severity: medium
+    tags: [logs, log-rotation, fluentd, disk, log-storm]
+    description: "Container log volume at capacity; covers log rotation failure, debug logging, log shipper backlog, and log storms."
+
+  # Networking
+  - file: network-dns-failure.md
+    title: "DNS Resolution Failure — Internal Cluster DNS"
+    family: networking
+    severity: critical
+    tags: [dns, coredns, kube-dns, network-policy, resolution]
+    description: "Pods cannot resolve service or external hostnames; covers CoreDNS health, ConfigMap errors, and network policy blocks."
+
+  - file: network-timeout.md
+    title: "Network Timeout — Intermittent or Sustained Connection Timeouts"
+    family: networking
+    severity: high
+    tags: [timeout, tcp, latency, mtu, circuit-breaker, connection-pool]
+    description: "Connections timing out at any layer; covers downstream overload, DNS delay, MTU mismatch, and connection pool exhaustion."
+
+  - file: network-certificate-expiry.md
+    title: "TLS Certificate Expiry — Warning or Hard Failure"
+    family: networking
+    severity: critical
+    tags: [tls, certificate, cert-manager, mtls, acme]
+    description: "TLS cert expired or expiring soon; covers cert-manager ACME challenge failures, manual certs, and internal CA expiry."
+
+  - file: network-ingress-502.md
+    title: "Ingress 5xx — Ingress Returning 502/503/504 to External Traffic"
+    family: networking
+    severity: high
+    tags: [ingress, 502, 503, 504, nginx, backend]
+    description: "Ingress returning 5xx; covers no healthy backends (503), backend crashes (502), and backend timeout (504)."
+
+  - file: network-service-mesh-error.md
+    title: "Service Mesh Error — Sidecar Proxy Failures or Circuit Breaker Open"
+    family: networking
+    severity: high
+    tags: [istio, envoy, service-mesh, circuit-breaker, mtls, xds]
+    description: "Envoy/Istio errors or circuit breaker open; covers circuit breaker trips, mTLS misconfiguration, and istiod unavailability."
+
+  # Data / Pipeline
+  - file: data-kafka-consumer-lag.md
+    title: "Kafka Consumer Lag — Consumer Group Falling Behind"
+    family: data
+    severity: high
+    tags: [kafka, consumer-lag, streaming, poison-pill, rebalance]
+    description: "Consumer group not keeping up with producer; covers consumer crash, rebalance, parallelism limits, and poison pill messages."
+
+  - file: data-elt-pipeline-failure.md
+    title: "ELT Pipeline Failure — Batch Pipeline Stale or Failed"
+    family: data
+    severity: high
+    tags: [elt, pipeline, airflow, prefect, schema, data-quality]
+    description: "Batch pipeline failed or data is stale; covers schema changes, data quality issues, scheduler health, and OOM on large batches."
+
+  - file: data-db-connection-pool.md
+    title: "Database Connection Pool Exhaustion"
+    family: data
+    severity: high
+    tags: [database, postgresql, connection-pool, pgbouncer, slow-query, lock]
+    description: "All DB connections in use, new requests blocked; covers slow queries, connection leaks, traffic spikes, and PgBouncer."
+
+  - file: data-db-replication-lag.md
+    title: "Database Replication Lag — Read Replica Lag Exceeds Threshold"
+    family: data
+    severity: high
+    tags: [postgresql, replication, replica, lag, read-replica, wal]
+    description: "Read replica falling behind primary; covers write load, blocking replica queries, and resource constraints on replica."
+
+  # Inference / GPU
+  - file: inference-gpu-oom.md
+    title: "GPU Out of Memory — GPU OOM During Model Serving"
+    family: inference
+    severity: critical
+    tags: [gpu, oom, vllm, kv-cache, cuda, tensor-parallel]
+    description: "CUDA OOM during inference; covers KV cache exhaustion, model too large for VRAM, and gpu_memory_utilization tuning."
+
+  - file: inference-worker-crash.md
+    title: "Inference Worker Crash — vLLM or Inference Worker Process Crash"
+    family: inference
+    severity: critical
+    tags: [vllm, worker, crash, nccl, gpu, cuda-error]
+    description: "Inference serving process exits unexpectedly; covers GPU OOM, NCCL errors, liveness probe misconfiguration, and weight corruption."
+
+  - file: inference-model-load-failure.md
+    title: "Model Load Failure — Model Fails to Load at Startup"
+    family: inference
+    severity: critical
+    tags: [vllm, model-load, startup, gpu, weights, tensor-parallel]
+    description: "Inference server cannot initialize model; covers missing weights, VRAM insufficient, startup probe timeout, and TP misconfiguration."
+
+  - file: inference-request-queue-depth.md
+    title: "Request Queue Depth — Inference Request Queue Backing Up"
+    family: inference
+    severity: high
+    tags: [vllm, queue, kv-cache, throughput, latency, scaling]
+    description: "Inference queue growing; covers capacity shortage, long-context requests blocking batch, and rate limiting."
+
+  - file: inference-throughput-drop.md
+    title: "Inference Throughput Drop — Tokens/sec Falls Below Baseline"
+    family: inference
+    severity: high
+    tags: [vllm, throughput, tokens-per-second, thermal, kv-cache, cpu-bottleneck]
+    description: "Generation throughput below baseline; covers worker downtime, thermal throttling, KV cache pressure, and framework regressions."
+
+  # Deployment / Rollout
+  - file: deployment-stuck-rollout.md
+    title: "Stuck Rollout — Deployment or Rollout Stalled"
+    family: deployment
+    severity: high
+    tags: [deployment, rollout, pdb, readiness-probe, resources]
+    description: "Deployment rollout not progressing; covers crashloop in new version, readiness probe failure, PDB blocking, and resource shortage."
+
+  - file: deployment-image-pull-error.md
+    title: "ImagePullBackOff — Container Image Pull Failing"
+    family: deployment
+    severity: high
+    tags: [image-pull, registry, imagepullsecret, docker-hub, credentials]
+    description: "Pod cannot pull its container image; covers missing image tag, expired credentials, registry auth, and network access."
+
+  # API
+  - file: api-latency-spike.md
+    title: "API Latency Spike — p95/p99 Latency Elevated"
+    family: api
+    severity: high
+    tags: [latency, p99, p95, slo, database, gc, downstream]
+    description: "API tail latency elevated; covers DB slow queries, downstream dependency slowness, GC pauses, and CPU saturation."
+
+  - file: api-error-rate-spike.md
+    title: "API Error Rate Spike — 5xx Error Rate Above Threshold"
+    family: api
+    severity: critical
+    tags: [5xx, error-rate, slo, crash, dependency, rollback]
+    description: "Server-side error rate elevated; covers deployment regression, dependency failure, resource exhaustion, and pod crashes."

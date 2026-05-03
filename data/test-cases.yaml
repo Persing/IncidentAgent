@@ -1,0 +1,441 @@
+# Labeled Test Cases — Incident Triage Agent Eval Set
+#
+# Format:
+#   id:                    Unique identifier (tc_001 ... tc_020)
+#   alert_description:     The raw input the triage agent receives.
+#                          Deliberately varied in format and vocabulary to reflect real inputs.
+#   expected_runbooks:     List of runbook filenames that should appear in the top-k retrieval results.
+#                          Order does not matter. All listed runbooks should be retrieved.
+#   primary_runbook:       The single most relevant runbook. Used for MRR (Mean Reciprocal Rank) calculation.
+#   difficulty:            easy | medium | hard
+#   category:              direct | semantic | multi_runbook | confusable
+#   notes:                 Explanation of why this is a useful test case.
+
+test_cases:
+
+  # ── DIRECT (alert language closely mirrors runbook language) ─────────────────
+
+  - id: tc_001
+    alert_description: >
+      [CRITICAL] KubePodCrashLooping
+      pod=inference-worker-7d9f4b8c6-xkp2q namespace=ml-serving
+      container=vllm-server restartCount=14
+      Pod has been crash looping for the last 22 minutes.
+    expected_runbooks:
+      - compute-crashloop.md
+    primary_runbook: compute-crashloop.md
+    difficulty: easy
+    category: direct
+    notes: >
+      Alert name and label "restartCount" directly match language in the crashloop runbook.
+      Baseline recall test — retriever should always get this right.
+
+  - id: tc_002
+    alert_description: >
+      [HIGH] TLSCertificateExpiringSoon
+      secret=inference-api-tls namespace=ml-serving
+      daysUntilExpiry=6
+      TLS certificate for inference-api.internal will expire in 6 days.
+      Automatic renewal has not succeeded for the last 3 renewal attempts.
+    expected_runbooks:
+      - network-certificate-expiry.md
+    primary_runbook: network-certificate-expiry.md
+    difficulty: easy
+    category: direct
+    notes: >
+      "TLS certificate", "expire", "renewal" are direct keyword matches.
+      Baseline test for the certificate runbook.
+
+  - id: tc_003
+    alert_description: >
+      [HIGH] KafkaConsumerGroupLag
+      consumer_group=inference-request-logger topic=model-requests
+      lag=142300 threshold=10000
+      Consumer group lag has exceeded threshold and is growing.
+      Current lag: 142,300 messages. Rate: +8,200 messages/min.
+    expected_runbooks:
+      - data-kafka-consumer-lag.md
+    primary_runbook: data-kafka-consumer-lag.md
+    difficulty: easy
+    category: direct
+    notes: >
+      "KafkaConsumerGroupLag" and "consumer group lag" are direct matches.
+      Baseline test for the Kafka runbook.
+
+  - id: tc_004
+    alert_description: >
+      [HIGH] ImagePullBackOff
+      pod=api-gateway-5f7d9c-lmn44 namespace=platform
+      image=registry.internal/api-gateway:v2.14.1
+      Failed to pull image: 401 Unauthorized.
+      imagePullBackOff detected, pod cannot start.
+    expected_runbooks:
+      - deployment-image-pull-error.md
+    primary_runbook: deployment-image-pull-error.md
+    difficulty: easy
+    category: direct
+    notes: >
+      "ImagePullBackOff" and "pull image" are direct keyword matches.
+      Baseline test — 401 Unauthorized adds a credentials-specific clue.
+
+  # ── SEMANTIC (alert uses different vocabulary than runbooks) ─────────────────
+
+  - id: tc_005
+    alert_description: >
+      Scoring service is completely unresponsive. Health checks have been timing out
+      for the past 8 minutes. No response on port 8080. The pod appears to be running
+      but not accepting connections. Users are getting 503 from the load balancer.
+      Last deploy was 35 minutes ago.
+    expected_runbooks:
+      - compute-crashloop.md
+      - network-ingress-502.md
+      - api-error-rate-spike.md
+    primary_runbook: compute-crashloop.md
+    difficulty: hard
+    category: semantic
+    notes: >
+      No Kubernetes alert terminology. "Not accepting connections", "health checks timing out",
+      "pod appears to be running" describes a pod in a liveness-probe-triggered crashloop without
+      naming it. Tests semantic understanding of what a crashloop looks like from the outside.
+      The 503 from the LB makes ingress-502 a reasonable secondary retrieval.
+
+  - id: tc_006
+    alert_description: >
+      Users are complaining about slow checkout. Our SLO dashboard shows p99 response
+      time on the order service has gone from 180ms to 4.2 seconds over the last 15 minutes.
+      p50 is still normal at 95ms. No recent deploys.
+    expected_runbooks:
+      - api-latency-spike.md
+      - data-db-connection-pool.md
+    primary_runbook: api-latency-spike.md
+    difficulty: medium
+    category: semantic
+    notes: >
+      "Slow checkout", "p99 response time" uses user-facing language rather than alert names.
+      p99 elevated but p50 normal is a classic DB pool or downstream dependency symptom,
+      making db-connection-pool a valuable secondary retrieval.
+
+  - id: tc_007
+    alert_description: >
+      Something is wrong with our dashboards. The revenue metrics and user activity charts
+      haven't updated since 02:00 UTC this morning. It's now 09:15 UTC. Downstream BI tools
+      are showing stale data. The Airflow UI shows some DAGs in a "failed" state.
+    expected_runbooks:
+      - data-elt-pipeline-failure.md
+    primary_runbook: data-elt-pipeline-failure.md
+    difficulty: hard
+    category: semantic
+    notes: >
+      Zero infrastructure terminology. "Stale dashboards", "charts haven't updated", and "Airflow
+      DAGs failed" are user/analyst language for an ELT pipeline failure. Tests whether the
+      retriever connects business symptoms to the correct infrastructure runbook.
+
+  - id: tc_008
+    alert_description: >
+      The new model we deployed this morning won't serve any traffic. The pod starts,
+      sits there for about 3 minutes, then goes into a restart loop. GPU memory looks
+      like it spikes immediately on startup and then the process dies.
+    expected_runbooks:
+      - inference-model-load-failure.md
+      - inference-gpu-oom.md
+      - compute-crashloop.md
+    primary_runbook: inference-model-load-failure.md
+    difficulty: medium
+    category: semantic
+    notes: >
+      "Won't serve traffic", "restarts loop", and "GPU memory spikes on startup" describes
+      a model load failure due to insufficient VRAM without using any runbook keyword phrases.
+      GPU OOM and crashloop are legitimate secondaries — the retriever should catch all three.
+
+  - id: tc_009
+    alert_description: >
+      On-call alert: inference cluster response times climbing steadily for the last 20 minutes.
+      p50 went from 800ms to 6.2 seconds. GPU utilization shows all workers at 100%.
+      New requests are queuing. No new deployment in the last 4 hours.
+    expected_runbooks:
+      - inference-request-queue-depth.md
+      - inference-throughput-drop.md
+    primary_runbook: inference-request-queue-depth.md
+    difficulty: medium
+    category: semantic
+    notes: >
+      "Requests are queuing" and "workers at 100%" without the exact metric or alert name.
+      Throughput drop is a reasonable secondary — the symptoms are consistent with both.
+
+  # ── MULTI-RUNBOOK (alert spans multiple runbook domains) ────────────────────
+
+  - id: tc_010
+    alert_description: >
+      [CRITICAL] KubeContainerOOMKilled + KubePodCrashLooping
+      pod=feature-store-api-6b8d9f-wqr91 namespace=ml-platform
+      container=api-server lastExitCode=137 restartCount=8
+      Container was OOM killed and is now in CrashLoopBackOff.
+      Memory limit: 2Gi. Last observed RSS: 2.1Gi before kill.
+    expected_runbooks:
+      - compute-oom-killed.md
+      - compute-crashloop.md
+    primary_runbook: compute-oom-killed.md
+    difficulty: easy
+    category: multi_runbook
+    notes: >
+      Two alert rules fire together. Exit code 137 is OOMKill. Retriever should fetch both
+      runbooks — the OOM runbook explains the root cause, the crashloop runbook explains
+      the current state and how to stabilize it. Tests retriever's ability to return
+      co-triggered runbooks.
+
+  - id: tc_011
+    alert_description: >
+      [CRITICAL] KubeNodeNotReady
+      node=gpu-node-14 region=us-east-2a
+      Node transitioned to NotReady at 14:32 UTC.
+      23 pods were running on this node. 17 are now in Terminating state.
+      Eviction of remaining pods has begun.
+    expected_runbooks:
+      - compute-node-not-ready.md
+      - compute-pending-pods.md
+    primary_runbook: compute-node-not-ready.md
+    difficulty: medium
+    category: multi_runbook
+    notes: >
+      The NotReady event is primary, but the downstream impact (17 pods terminating, eviction)
+      means pending-pods is the immediate follow-on problem. Both runbooks are needed to
+      fully triage the incident. Tests retrieval of the causal chain.
+
+  - id: tc_012
+    alert_description: >
+      [CRITICAL] vLLM worker on gpu-node-09 has crashed with CUDA out-of-memory error.
+      Worker process exited with code 1. GPU memory utilization was at 99.4% prior to crash.
+      Pod is being restarted by Kubernetes (restart #3).
+    expected_runbooks:
+      - inference-worker-crash.md
+      - inference-gpu-oom.md
+      - compute-crashloop.md
+    primary_runbook: inference-worker-crash.md
+    difficulty: easy
+    category: multi_runbook
+    notes: >
+      Worker crash is primary, but CUDA OOM is the stated cause (inference-gpu-oom) and the
+      restart behavior maps to CrashLoop. All three runbooks should be retrieved. Tests
+      whether the retriever can surface the cause, the effect, and the Kubernetes state
+      simultaneously.
+
+  - id: tc_013
+    alert_description: >
+      [HIGH] Deployment rollout for recommendation-service is stuck.
+      New pods are crashing immediately after start. Old pods are still running.
+      Rollout has been stalled for 18 minutes. Error in new pod logs:
+      "connection refused: postgres://db-primary:5432"
+    expected_runbooks:
+      - deployment-stuck-rollout.md
+      - compute-crashloop.md
+      - data-db-connection-pool.md
+    primary_runbook: deployment-stuck-rollout.md
+    difficulty: medium
+    category: multi_runbook
+    notes: >
+      Stuck rollout is the presenting symptom. New pods crashing on startup because they can't
+      connect to DB means crashloop and db-connection-pool are both relevant for understanding
+      the root cause. Tests multi-layer retrieval across deployment and data family.
+
+  - id: tc_014
+    alert_description: >
+      [CRITICAL] NodeDiskPressure
+      node=worker-node-31 namespace=kube-system
+      Node disk usage at 97%. Kubelet has begun evicting pods to free space.
+      Node may transition to NotReady if disk is not cleared.
+    expected_runbooks:
+      - storage-disk-pressure.md
+      - compute-node-not-ready.md
+    primary_runbook: storage-disk-pressure.md
+    difficulty: medium
+    category: multi_runbook
+    notes: >
+      Disk pressure is the current state; NotReady is the imminent risk.
+      Retriever should fetch both — the disk-pressure runbook to resolve it
+      and the node-not-ready runbook to understand what happens if you don't.
+
+  - id: tc_015
+    alert_description: >
+      [HIGH] API error rate for payments-service is at 8.4% (threshold: 1%).
+      Errors started spiking 12 minutes ago. Error type: "DEADLINE_EXCEEDED" on
+      calls to the account-service. p99 latency on payments-service is 14 seconds.
+      No deployments in the last 2 hours.
+    expected_runbooks:
+      - api-error-rate-spike.md
+      - api-latency-spike.md
+      - network-timeout.md
+    primary_runbook: api-error-rate-spike.md
+    difficulty: medium
+    category: multi_runbook
+    notes: >
+      DEADLINE_EXCEEDED errors from a downstream service with no recent deploy points
+      to a network/timeout issue between services. All three runbooks are needed:
+      error-rate for the presenting alert, latency-spike for the p99 context, and
+      network-timeout for the cross-service DEADLINE_EXCEEDED root cause.
+
+  # ── CONFUSABLE (similar surface description, different correct runbook) ──────
+
+  - id: tc_016
+    alert_description: >
+      [HIGH] KubePodCPUSaturation
+      pod=tokenizer-service-84d9f-bxt22 namespace=ml-serving
+      CPU throttling: 78% of CPU periods throttled over the last 10 minutes.
+      Current CPU usage: 1,850m. Limit: 2000m.
+      No memory pressure observed. Pod is healthy and responding to probes.
+    expected_runbooks:
+      - compute-high-cpu.md
+    primary_runbook: compute-high-cpu.md
+    difficulty: medium
+    category: confusable
+    notes: >
+      CONFUSABLE with compute-oom-killed.md. "CPU throttling", "CPU periods", and explicit
+      "no memory pressure" signals this is a CPU saturation issue, not OOM.
+      The retriever must not surface oom-killed as primary. Tests precision between
+      two closely related compute runbooks.
+
+  - id: tc_017
+    alert_description: >
+      [HIGH] DNS resolution failures detected in namespace ml-serving.
+      CoreDNS error rate: 12% of queries returning SERVFAIL.
+      Affected pods cannot resolve internal service names (e.g., db-primary.svc.cluster.local).
+      External DNS resolution appears unaffected.
+    expected_runbooks:
+      - network-dns-failure.md
+    primary_runbook: network-dns-failure.md
+    difficulty: medium
+    category: confusable
+    notes: >
+      CONFUSABLE with network-timeout.md. "Resolution failures", "SERVFAIL", and
+      "internal service names" clearly target the DNS runbook, not generic timeout.
+      "External DNS appears unaffected" is a key signal that narrows it to CoreDNS (in-cluster),
+      not the upstream resolver. Tests that the retriever distinguishes DNS from timeout.
+
+  - id: tc_018
+    alert_description: >
+      [HIGH] KubeDeploymentReplicasMismatch
+      deployment=data-pipeline-worker namespace=data-platform
+      desired=6 ready=3 available=3
+      3 pods have been in Pending state for 11 minutes.
+      Scheduler event: "0/18 nodes available: 6 Insufficient cpu, 12 node(s) had untolerated taint"
+    expected_runbooks:
+      - compute-pending-pods.md
+    primary_runbook: compute-pending-pods.md
+    difficulty: medium
+    category: confusable
+    notes: >
+      CONFUSABLE with compute-resource-quota-exceeded.md. "Insufficient cpu" and "untolerated taint"
+      are scheduling failures, not quota exhaustion. The scheduler event message is the key signal —
+      it mentions node-level constraints, not namespace quota. Tests that the retriever correctly
+      distinguishes scheduling from quota problems.
+
+  - id: tc_019
+    alert_description: >
+      [CRITICAL] Persistent volume claim data-pipeline-pvc in namespace data-platform
+      is stuck in Pending state. StorageClass: fast-ssd. No PersistentVolume has been bound.
+      Pod data-pipeline-worker-0 cannot start because the PVC is unbound.
+    expected_runbooks:
+      - storage-pvc-mount-failure.md
+      - compute-pending-pods.md
+    primary_runbook: storage-pvc-mount-failure.md
+    difficulty: medium
+    category: confusable
+    notes: >
+      CONFUSABLE with storage-disk-pressure.md. "PVC stuck in Pending", "no PV bound",
+      and "StorageClass" clearly target the PVC mount runbook, not disk pressure.
+      compute-pending-pods is a valid secondary because the pod can't start.
+      Tests that the retriever distinguishes PVC lifecycle from node-level disk issues.
+
+  - id: tc_020
+    alert_description: >
+      Read replica postgres-replica-2 is lagging 9 minutes and 14 seconds behind primary.
+      Replica lag threshold: 30 seconds. Replication slot on primary is consuming 14GB of WAL.
+      Application is still routing read queries to this replica.
+    expected_runbooks:
+      - data-db-replication-lag.md
+    primary_runbook: data-db-replication-lag.md
+    difficulty: hard
+    category: confusable
+    notes: >
+      CONFUSABLE with data-db-connection-pool.md. "Replication slot", "WAL", and "lagging behind
+      primary" are replication-specific terms. The connection pool runbook would be wrong here.
+      "Application is still routing reads" adds urgency — staleness is actively affecting reads.
+      Tests that the retriever distinguishes replication lag from connection pool exhaustion
+      despite both being database-family incidents.
+
+  # ── COVERAGE COMPLETIONS (ensures all 28 runbooks have at least one test case) ──
+
+  - id: tc_021
+    alert_description: >
+      [HIGH] NamespaceResourceQuotaExceeded
+      namespace=ml-platform resource=requests.cpu
+      used=47.8 hard=48.0
+      New pods in this namespace are being rejected by the API server.
+      Deployment ml-feature-server is stuck at 4/6 replicas. No new pods are appearing.
+      HPA is trying to scale but no new pods show up in kubectl get pods.
+    expected_runbooks:
+      - compute-resource-quota-exceeded.md
+      - compute-pending-pods.md
+    primary_runbook: compute-resource-quota-exceeded.md
+    difficulty: medium
+    category: confusable
+    notes: >
+      CONFUSABLE with compute-pending-pods.md. "Pods rejected by API server" and "no new pods
+      appear at all" is the key signal distinguishing quota exhaustion from a scheduling failure
+      — scheduling failures still create Pending pods, quota exhaustion prevents pod creation
+      entirely. compute-pending-pods is a valid secondary because the HPA scale-out is blocked.
+
+  - id: tc_022
+    alert_description: >
+      [CRITICAL] etcd cluster on control-plane nodes is showing elevated write latency.
+      etcd_disk_wal_fsync_duration_seconds p99 = 420ms (threshold: 10ms).
+      etcd_disk_backend_commit_duration_seconds p99 = 890ms.
+      API server requests are queuing. kubectl commands are timing out intermittently.
+    expected_runbooks:
+      - storage-etcd-disk.md
+    primary_runbook: storage-etcd-disk.md
+    difficulty: hard
+    category: direct
+    notes: >
+      "etcd_disk_wal_fsync_duration_seconds" is a direct signal for the etcd disk runbook.
+      "kubectl commands timing out" adds urgency context — this is a control plane incident,
+      not just a storage issue. This is a high-stakes runbook that should always be in the
+      top-1 result for any etcd-specific alert.
+
+  - id: tc_023
+    alert_description: >
+      [HIGH] Container filesystem at 94% capacity.
+      pod=audit-log-collector-59f7d-p2kqx namespace=security container=log-writer
+      Volume: /var/log/app (emptyDir). The container is writing logs faster than
+      the log shipper is draining them. Log files are accumulating.
+    expected_runbooks:
+      - storage-log-volume-full.md
+      - storage-disk-pressure.md
+    primary_runbook: storage-log-volume-full.md
+    difficulty: medium
+    category: confusable
+    notes: >
+      CONFUSABLE with storage-disk-pressure.md. "Container filesystem at 94%", "log files
+      accumulating", and "log shipper not draining" points specifically to the log-volume-full
+      runbook (container-level volume, log rotation/shipping issue). Disk pressure is a valid
+      secondary — if the container's emptyDir grows unchecked it will contribute to node disk
+      pressure. The distinction: log-volume-full is a container-level fix, disk-pressure is
+      a node-level fix.
+
+  - id: tc_024
+    alert_description: >
+      Multiple services in the payments namespace are reporting intermittent connection
+      failures to each other. The errors started after Istio was upgraded 45 minutes ago.
+      Envoy proxy logs show "upstream connect error or disconnect/reset before headers.
+      reset reason: connection failure". mTLS handshakes are failing between pods.
+    expected_runbooks:
+      - network-service-mesh-error.md
+      - network-certificate-expiry.md
+    primary_runbook: network-service-mesh-error.md
+    difficulty: hard
+    category: semantic
+    notes: >
+      "Envoy proxy", "Istio upgrade", and "mTLS handshakes failing" are strong service mesh
+      signals, but they are post-upgrade failure language rather than Alertmanager alert names.
+      network-certificate-expiry is a valid secondary — mTLS handshake failures can be caused
+      by cert rotation issues that surfaced during the upgrade. Tests semantic understanding
+      of service mesh failure language.
