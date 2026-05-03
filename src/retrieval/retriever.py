@@ -162,7 +162,6 @@ class RunbookRetriever:
         # Restricts ChromaDB to only the classified families so the semantic
         # search cannot be drowned out by runbooks from other families that
         # happen to score better on the plain-language query text.
-        family_sem_ranked: list[tuple[str, float]] = []
         if family_filter:
             family_sem_ranked = self._semantic_search_filtered(
                 query, fetch_k, families=family_filter

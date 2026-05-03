@@ -173,7 +173,7 @@ class TestParseRunbook:
 
 class TestIngestionStats:
     def test_str_no_errors(self):
-        stats = IngestionStats(runbooks_processed=5, chunks_created=30, chunks_skipped=2)
+        stats = IngestionStats(runbooks_processed=5, chunks_upserted=30)
         text = str(stats)
         assert "5" in text
         assert "30" in text

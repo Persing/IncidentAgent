@@ -71,11 +71,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application memory usage, limits, leak fixes | **Application Team** (service owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Node-level memory pressure, kubelet eviction | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Physical DIMM or memory hardware failure | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
+| Layer                                        | Team                                 | Contact                                                |
+|----------------------------------------------|--------------------------------------|--------------------------------------------------------|
+| Application memory usage, limits, leak fixes | **Application Team** (service owner) | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Node-level memory pressure, kubelet eviction | **Platform Engineering**             | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Physical DIMM or memory hardware failure     | **Hardware & Datacenter Ops**        | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`         |
 
 **Boundary:** Application teams own memory limit configuration and their process's memory behavior (leaks, large payloads). Platform Engineering owns node-level memory pressure and kubelet eviction policy. If OOMKills are occurring on multiple pods across a node simultaneously without an application explanation, escalate to Platform Engineering — the node itself may have a memory hardware issue.
 

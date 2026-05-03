@@ -69,10 +69,10 @@ Escalate to the on-call engineer or platform team if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| ResourceQuota configuration, namespace provisioning | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Workload resource requests, zombie pod cleanup | **Application Team** (namespace owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Layer                                               | Team                                   | Contact                                                |
+|-----------------------------------------------------|----------------------------------------|--------------------------------------------------------|
+| ResourceQuota configuration, namespace provisioning | **Platform Engineering**               | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Workload resource requests, zombie pod cleanup      | **Application Team** (namespace owner) | See service `CODEOWNERS` · Slack: `#team-<service>`    |
 
 **Boundary:** Platform Engineering provisions and owns ResourceQuota objects. Application teams own the workloads consuming quota within their namespace. Quota increases require Platform Engineering approval — the application team makes the request with justification. If a different team's workload consumed the quota, Platform Engineering coordinates between teams. Do not unilaterally delete another team's pods to free quota.
 

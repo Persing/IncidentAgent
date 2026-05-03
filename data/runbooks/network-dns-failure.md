@@ -78,11 +78,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| CoreDNS, kube-dns service, in-cluster DNS config | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Upstream/authoritative DNS, external resolver infrastructure | **Network / Infrastructure** | Slack: `#network-oncall` · PD: `network-infrastructure` |
-| Network policy blocking DNS traffic | **Platform Engineering** (policy) + **Network / Infrastructure** (if firewall) | Both channels |
+| Layer                                                        | Team                                                                           | Contact                                                 |
+|--------------------------------------------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------|
+| CoreDNS, kube-dns service, in-cluster DNS config             | **Platform Engineering**                                                       | Slack: `#platform-oncall` · PD: `platform-engineering`  |
+| Upstream/authoritative DNS, external resolver infrastructure | **Network / Infrastructure**                                                   | Slack: `#network-oncall` · PD: `network-infrastructure` |
+| Network policy blocking DNS traffic                          | **Platform Engineering** (policy) + **Network / Infrastructure** (if firewall) | Both channels                                           |
 
 **Boundary:** Platform Engineering owns everything CoreDNS and in-cluster. Network / Infrastructure owns the authoritative DNS servers and any upstream resolvers configured in the Corefile's `forward` plugin. If external hostname resolution is broken but internal service resolution works, escalate to Network / Infrastructure. If both internal and external resolution are broken, start with Platform Engineering (CoreDNS) — external resolution flows through CoreDNS first.
 

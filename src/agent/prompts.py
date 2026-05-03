@@ -166,7 +166,7 @@ TRIAGE_PROMPT = ChatPromptTemplate.from_messages(
 
 def format_runbook_context(runbook_paths: list[str]) -> str:
     """
-    Load and format runbook markdown files into a single context block
+    Load and format runbook Markdown files into a single context block
     for inclusion in the LLM prompt.
 
     Strips the ## Tags section (metadata noise) but keeps everything else,

@@ -26,6 +26,7 @@ Example request:
 from __future__ import annotations
 
 import logging
+import re
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -119,9 +120,9 @@ async def lifespan(api_app: FastAPI):
     logger.info(
         "Starting up — embedding=%s/%s llm=%s/%s log_level=%s",
         settings.embedding_provider,
-        _embedding_model(settings),
+        settings.active_embedding_model,
         settings.llm_provider,
-        _llm_model(settings),
+        settings.active_llm_model,
         settings.log_level,
     )
 
@@ -217,6 +218,7 @@ async def triage(request_body: TriageRequest, response: Response) -> TriageRespo
     try:
         state = await run_triage_full_async(
             query=request_body.query,
+            return_k=request_body.return_k,
             graph=graph,
             run_config=run_config,
         )
@@ -283,9 +285,9 @@ async def health() -> HealthResponse:
     return HealthResponse(
         status="ok",
         embedding_provider=settings.embedding_provider,
-        embedding_model=_embedding_model(settings),
+        embedding_model=settings.active_embedding_model,
         llm_provider=settings.llm_provider,
-        llm_model=_llm_model(settings),
+        llm_model=settings.active_llm_model,
         runbooks_indexed=runbook_count,
     )
 
@@ -302,8 +304,6 @@ async def list_runbooks() -> list[RunbookSummary]:
     Reads the Tags section from each Markdown file. Useful for understanding
     what the agent knows about and for debugging retrieval misses.
     """
-    import re
-
     settings: Settings = app.state.settings
     runbooks_dir = Path(settings.runbooks_dir)
 
@@ -328,24 +328,3 @@ async def list_runbooks() -> list[RunbookSummary]:
     return summaries
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-
-def _embedding_model(settings: Settings) -> str:
-    if settings.embedding_provider == "openai":
-        return settings.openai_embedding_model
-    if settings.embedding_provider == "ollama":
-        return settings.ollama_embedding_model
-    if settings.embedding_provider == "huggingface":
-        return settings.hf_embedding_model
-    return "unknown"
-
-
-def _llm_model(settings: Settings) -> str:
-    if settings.llm_provider == "openai":
-        return settings.openai_llm_model
-    if settings.llm_provider == "anthropic":
-        return settings.anthropic_model
-    if settings.llm_provider == "ollama":
-        return settings.ollama_llm_model
-    return "unknown"

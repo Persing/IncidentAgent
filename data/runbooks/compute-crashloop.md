@@ -82,10 +82,10 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application code, config, secrets | **Application Team** (service owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Cluster config, probe defaults, secret injection | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Layer                                            | Team                                 | Contact                                                |
+|--------------------------------------------------|--------------------------------------|--------------------------------------------------------|
+| Application code, config, secrets                | **Application Team** (service owner) | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Cluster config, probe defaults, secret injection | **Platform Engineering**             | Slack: `#platform-oncall` · PD: `platform-engineering` |
 
 **Boundary:** Application teams own whatever is causing the process to exit — their code, their config, their secrets. Platform Engineering owns cluster-level concerns: if the crash is caused by a missing secret that Platform Engineering provisions, or a liveness probe default that was changed cluster-wide, that crosses into their scope. If rollback is blocked by a cluster-level issue, loop in Platform Engineering.
 

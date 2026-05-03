@@ -90,15 +90,13 @@ class IngestionStats:
     """Summary of a completed ingestion run."""
 
     runbooks_processed: int = 0
-    chunks_created: int = 0
-    chunks_skipped: int = 0
+    chunks_upserted: int = 0
     errors: list[str] = field(default_factory=list)
 
     def __str__(self) -> str:
         lines = [
             f"Runbooks processed : {self.runbooks_processed}",
-            f"Chunks created     : {self.chunks_created}",
-            f"Chunks skipped     : {self.chunks_skipped}",
+            f"Chunks upserted    : {self.chunks_upserted}",
         ]
         if self.errors:
             lines.append(f"Errors             : {len(self.errors)}")
@@ -271,7 +269,7 @@ def ingest_runbooks(settings: Settings | None = None) -> IngestionStats:
     # Upsert — safe to re-run; existing IDs are updated, not duplicated
     vectorstore.add_documents(documents=documents, ids=ids)
 
-    stats.chunks_created = len(all_chunks)
+    stats.chunks_upserted = len(all_chunks)
     logger.info("Ingestion complete.\n%s", stats)
 
     return stats

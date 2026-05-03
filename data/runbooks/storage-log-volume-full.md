@@ -64,9 +64,9 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application log behavior, log rotation config | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Layer                                                     | Team                     | Contact                                                |
+|-----------------------------------------------------------|--------------------------|--------------------------------------------------------|
+| Application log behavior, log rotation config             | **Application Team**     | See service `CODEOWNERS` · Slack: `#team-<service>`    |
 | Log shipping infrastructure (Fluentd/Filebeat daemonsets) | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
 
 **Boundary:** Application teams own log volume sizing requests and their application's logging configuration (level, rotation). Platform Engineering owns the log shipping infrastructure that drains the logs off the container. If the log shipper (Fluentd/Filebeat) is the bottleneck, that is a Platform Engineering issue. If the application is generating too many logs, that is the application team's issue to fix.

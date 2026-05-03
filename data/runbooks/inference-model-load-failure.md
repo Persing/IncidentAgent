@@ -85,11 +85,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Inference server startup config, startup probe, TP config | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
-| Model weights storage, model download pipeline | **Data Engineering** (model storage) or **ML Infrastructure** | Slack: `#data-oncall` or `#ml-infra-oncall` |
-| GPU availability and VRAM for the model | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| Layer                                                     | Team                                                          | Contact                                             |
+|-----------------------------------------------------------|---------------------------------------------------------------|-----------------------------------------------------|
+| Inference server startup config, startup probe, TP config | **ML Infrastructure**                                         | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| Model weights storage, model download pipeline            | **Data Engineering** (model storage) or **ML Infrastructure** | Slack: `#data-oncall` or `#ml-infra-oncall`         |
+| GPU availability and VRAM for the model                   | **ML Infrastructure**                                         | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
 
 **Boundary:** ML Infrastructure owns the model load process and is first responder. If model weights are missing or corrupted on the storage volume, the owning team depends on how model storage is managed — if Data Engineering runs the model registry and download pipeline, they own the fix. If ML Infrastructure owns the model pipeline end-to-end, they own it. Clarify this boundary in your org before an incident.
 

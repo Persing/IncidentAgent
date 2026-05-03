@@ -81,11 +81,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Kafka cluster health, broker configuration, topic creation | **Data Engineering** | Slack: `#data-oncall` · PD: `data-engineering` |
-| Consumer application code and deployment | **Application Team** (consumer owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Consumer offset reset operations | **Data Engineering** (must approve and execute) | Slack: `#data-oncall` — do not reset offsets without their sign-off |
+| Layer                                                      | Team                                            | Contact                                                             |
+|------------------------------------------------------------|-------------------------------------------------|---------------------------------------------------------------------|
+| Kafka cluster health, broker configuration, topic creation | **Data Engineering**                            | Slack: `#data-oncall` · PD: `data-engineering`                      |
+| Consumer application code and deployment                   | **Application Team** (consumer owner)           | See service `CODEOWNERS` · Slack: `#team-<service>`                 |
+| Consumer offset reset operations                           | **Data Engineering** (must approve and execute) | Slack: `#data-oncall` — do not reset offsets without their sign-off |
 
 **Boundary:** Data Engineering owns the Kafka cluster and has authority over offset management. Application teams own their consumer code and scaling. **Critical:** Consumer group offset resets are a Data Engineering operation — application teams must not perform resets unilaterally, as incorrect resets can cause duplicate processing or message loss affecting other consumers of the same topic. If the consumer is the bottleneck, the application team fixes it. If the broker is the bottleneck, Data Engineering fixes it.
 

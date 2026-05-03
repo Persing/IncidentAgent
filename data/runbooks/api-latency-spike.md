@@ -63,7 +63,7 @@ An API latency spike means the tail latency of a service's responses has risen s
 2. **If a downstream service is slow:** Apply a circuit breaker or timeout to prevent slow downstream from cascading. Check the downstream service using its own latency runbook.
 3. **If CPU is saturated:** Scale out the service horizontally. Review [compute-high-cpu.md](compute-high-cpu.md).
 4. **If GC pause is the cause:** JVM: tune GC settings or increase heap. Python: review object allocation patterns. Restart affected pods to reset GC state as a short-term measure.
-5. **If a deploy caused the regression:** Roll back:
+5. **If a deployment caused the regression:** Roll back:
    ```bash
    kubectl rollout undo deployment/<deployment-name> -n <namespace>
    ```
@@ -82,12 +82,12 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application code, caching, query efficiency | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Database performance, query plans, index tuning | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability` |
-| Cluster resources, node capacity, HPA | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Inference backend latency | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| Layer                                           | Team                                 | Contact                                                |
+|-------------------------------------------------|--------------------------------------|--------------------------------------------------------|
+| Application code, caching, query efficiency     | **Application Team**                 | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Database performance, query plans, index tuning | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability`       |
+| Cluster resources, node capacity, HPA           | **Platform Engineering**             | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Inference backend latency                       | **ML Infrastructure**                | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure`    |
 
 **Boundary:** Application teams own their code's latency and must perform the initial triage. Once the root cause is identified at a specific layer, hand off to the owning team: DRE for DB query issues, Platform Engineering for resource saturation, ML Infrastructure for inference backend. Do not engage all teams simultaneously at alert time — triage first, then escalate to the right team.
 

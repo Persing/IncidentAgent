@@ -71,11 +71,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| vLLM config, batching strategy, framework version | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
-| GPU hardware health, thermal management | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
-| Request distribution / workload characteristics | **Application Team** (API consumer) | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Layer                                             | Team                                | Contact                                             |
+|---------------------------------------------------|-------------------------------------|-----------------------------------------------------|
+| vLLM config, batching strategy, framework version | **ML Infrastructure**               | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| GPU hardware health, thermal management           | **Hardware & Datacenter Ops**       | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`      |
+| Request distribution / workload characteristics   | **Application Team** (API consumer) | See service `CODEOWNERS` · Slack: `#team-<service>` |
 
 **Boundary:** ML Infrastructure owns throughput and is the first call. Thermal throttling is a joint escalation: ML Infrastructure identifies it via `nvidia-smi`, Hardware & Datacenter Ops physically investigates and remediates cooling. If the throughput drop is caused by a client sending longer requests (workload shift), the application team consuming the inference API is the stakeholder to coordinate with on capacity implications.
 

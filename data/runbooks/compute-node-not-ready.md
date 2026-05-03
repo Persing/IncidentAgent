@@ -75,12 +75,12 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Node health, kubelet, cluster autoscaler | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Physical node hardware, OOB management | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
-| Cloud instance health events (cloud-hosted) | **Platform Engineering** → cloud provider support | Platform Eng opens the provider ticket |
-| Network partition to node | **Network / Infrastructure** | Slack: `#network-oncall` · PD: `network-infrastructure` |
+| Layer                                       | Team                                              | Contact                                                 |
+|---------------------------------------------|---------------------------------------------------|---------------------------------------------------------|
+| Node health, kubelet, cluster autoscaler    | **Platform Engineering**                          | Slack: `#platform-oncall` · PD: `platform-engineering`  |
+| Physical node hardware, OOB management      | **Hardware & Datacenter Ops**                     | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`          |
+| Cloud instance health events (cloud-hosted) | **Platform Engineering** → cloud provider support | Platform Eng opens the provider ticket                  |
+| Network partition to node                   | **Network / Infrastructure**                      | Slack: `#network-oncall` · PD: `network-infrastructure` |
 
 **Boundary:** Platform Engineering is first responder for any NotReady node. They determine whether the cause is software (kubelet, disk, OS) or hardware. If the node is physically inaccessible or shows hardware fault indicators (OOB logs, console errors), they hand off to Hardware & Datacenter Ops. If the node is unreachable due to a network-level partition (not just kubelet), they loop in Network / Infrastructure. Cloud instance events (spot preemption, live migration) are handled by Platform Engineering via the cloud provider console.
 

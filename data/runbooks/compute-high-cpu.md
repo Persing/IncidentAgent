@@ -78,11 +78,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application code, resource limits | **Application Team** (service owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Kubernetes scheduling, HPA, node health | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Physical node hardware | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
+| Layer                                   | Team                                 | Contact                                                |
+|-----------------------------------------|--------------------------------------|--------------------------------------------------------|
+| Application code, resource limits       | **Application Team** (service owner) | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Kubernetes scheduling, HPA, node health | **Platform Engineering**             | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Physical node hardware                  | **Hardware & Datacenter Ops**        | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`         |
 
 **Boundary:** Application teams own their pod's CPU limit and application behavior. Platform Engineering owns the node and the HPA controller. If CPU is pegged at the node level across multiple pods, escalate to Platform Engineering. If the cause is a hardware anomaly (e.g., a physical core failing or thermal throttle), escalate to Hardware & Datacenter Ops.
 

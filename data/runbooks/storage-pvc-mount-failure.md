@@ -73,18 +73,18 @@ A PersistentVolumeClaim (PVC) mount failure prevents a pod from starting because
 ## Escalation Criteria
 Escalate to the on-call engineer if:
 - Force-deleting VolumeAttachment does not resolve the issue after 10 minutes
-- The PV contains critical data and you are uncertain whether it is safe to manipulate
+- The PV contains critical data, and you are uncertain whether it is safe to manipulate
 - CSI driver restart does not restore provisioning capability
 - Multiple PVCs are simultaneously failing to mount (possible cloud provider storage outage)
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| StorageClass, CSI driver, PV lifecycle | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Application PVC spec, fsGroup, mount paths | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Cloud block volume infrastructure | **Platform Engineering** → cloud provider support | Platform Eng opens provider ticket |
-| Physical storage hardware (SAN, NAS) | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
+| Layer                                      | Team                                              | Contact                                                |
+|--------------------------------------------|---------------------------------------------------|--------------------------------------------------------|
+| StorageClass, CSI driver, PV lifecycle     | **Platform Engineering**                          | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Application PVC spec, fsGroup, mount paths | **Application Team**                              | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Cloud block volume infrastructure          | **Platform Engineering** → cloud provider support | Platform Eng opens provider ticket                     |
+| Physical storage hardware (SAN, NAS)       | **Hardware & Datacenter Ops**                     | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`         |
 
 **Boundary:** Platform Engineering owns the CSI driver and StorageClass. Application teams own their PVC spec and how they configure the mounted volume in their pod. If the CSI driver is healthy but the cloud provider's volume attachment API is failing, Platform Engineering escalates to the cloud provider. Do not delete PVs containing application data without explicit sign-off from the owning application team.
 

@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 class IncidentFamily(str, Enum):
     """The seven runbook families in the corpus.
 
-    Values match the `family:` tag used in the runbook markdown files and
+    Values match the `family:` tag used in the runbook Markdown files and
     stored in ChromaDB metadata — used for metadata-filtered retrieval.
     """
     COMPUTE = "compute"

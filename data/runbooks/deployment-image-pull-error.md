@@ -88,11 +88,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application image, CI/CD pipeline, image tag | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| imagePullSecret provisioning, registry proxy/mirror | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Registry credentials, secret rotation | **Security Engineering** (if centrally managed) or **Application Team** | Slack: `#security-oncall` or `#team-<service>` |
+| Layer                                               | Team                                                                    | Contact                                                |
+|-----------------------------------------------------|-------------------------------------------------------------------------|--------------------------------------------------------|
+| Application image, CI/CD pipeline, image tag        | **Application Team**                                                    | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| imagePullSecret provisioning, registry proxy/mirror | **Platform Engineering**                                                | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Registry credentials, secret rotation               | **Security Engineering** (if centrally managed) or **Application Team** | Slack: `#security-oncall` or `#team-<service>`         |
 
 **Boundary:** Application teams own their image tags and CI/CD pipeline that pushes images. Platform Engineering owns the cluster-level pull secret infrastructure and any registry mirror or proxy. If pull credentials were revoked as part of a security event, Security Engineering leads the rotation. For Docker Hub rate limiting, Platform Engineering configures the authenticated pull or mirror solution.
 

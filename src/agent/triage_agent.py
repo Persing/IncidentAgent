@@ -60,15 +60,18 @@ class TriageState(TypedDict):
     Each node reads from this dict and returns a partial update.
     LangGraph merges the updates into the running state automatically.
 
-    Fields added in Phase 2:
+    Fields:
+        query            — raw incident alert text from the caller.
+        return_k         — number of runbooks to retrieve (default 3).
         classification   — structured output from the classify node; None if
                            classification failed or was skipped.
-        augmented_query  — the query actually used for retrieval: original text
-                           plus extracted infrastructure signals from classify.
-                           Falls back to raw query if classification is None.
+        runbook_matches  — ranked RunbookMatch objects from the retrieve node.
+        context          — full runbook Markdown loaded for the LLM.
+        triage_plan      — final structured output from the generate node.
     """
 
     query: str
+    return_k: int
     classification: Optional[ClassificationResult]
     runbook_matches: list[RunbookMatch]
     context: str
@@ -119,7 +122,7 @@ def make_retrieve_node(retriever: RunbookRetriever):
 
         matches = retriever.retrieve(
             raw_query,
-            return_k=3,
+            return_k=state.get("return_k", 3),
             bm25_query=bm25_query,
             family_filter=family_filter,
         )
@@ -239,6 +242,7 @@ def _get_or_build_graph(graph, settings: Settings | None) -> object:
 
 def run_triage_full(
     query: str,
+    return_k: int = 3,
     graph=None,
     settings: Settings | None = None,
     run_config: RunnableConfig | None = None,
@@ -254,6 +258,7 @@ def run_triage_full(
 
     Args:
         query:      The incident alert text or description.
+        return_k:   Number of runbooks to retrieve and use as context (default 3).
         graph:      A pre-built compiled LangGraph. If None, uses the
                     module-level singleton (built on first call).
         settings:   Application settings. Ignored if graph is provided.
@@ -271,6 +276,7 @@ def run_triage_full(
 
     initial_state: TriageState = {
         "query": query,
+        "return_k": return_k,
         "classification": None,
         "runbook_matches": [],
         "context": "",
@@ -282,6 +288,7 @@ def run_triage_full(
 
 async def run_triage_full_async(
     query: str,
+    return_k: int = 3,
     graph=None,
     settings: Settings | None = None,
     run_config: RunnableConfig | None = None,
@@ -296,6 +303,7 @@ async def run_triage_full_async(
 
     initial_state: TriageState = {
         "query": query,
+        "return_k": return_k,
         "classification": None,
         "runbook_matches": [],
         "context": "",

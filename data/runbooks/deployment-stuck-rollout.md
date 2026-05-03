@@ -85,9 +85,9 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application code, image, deployment config | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Layer                                              | Team                     | Contact                                                |
+|----------------------------------------------------|--------------------------|--------------------------------------------------------|
+| Application code, image, deployment config         | **Application Team**     | See service `CODEOWNERS` · Slack: `#team-<service>`    |
 | PodDisruptionBudgets, cluster capacity, scheduling | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
 
 **Boundary:** Application teams own their deployment and rollback decisions. Platform Engineering is involved when the rollout is blocked by a cluster-level constraint (PDB preventing termination, resource quota, scheduling failure). The application team initiates rollback; if rollback itself is blocked, loop in Platform Engineering. Do not modify another team's PDB during an incident without their explicit consent — it may affect their availability guarantees.

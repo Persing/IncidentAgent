@@ -74,11 +74,11 @@ Escalate to the senior on-call or cluster admin immediately if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| etcd cluster health, compaction, defragmentation | **Platform Engineering** (senior/lead on-call) | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Control plane node hardware, disk replacement | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
-| Cloud-managed etcd / control plane (e.g., EKS, GKE) | **Platform Engineering** → cloud provider support | Platform Eng opens the provider ticket |
+| Layer                                               | Team                                              | Contact                                                |
+|-----------------------------------------------------|---------------------------------------------------|--------------------------------------------------------|
+| etcd cluster health, compaction, defragmentation    | **Platform Engineering** (senior/lead on-call)    | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Control plane node hardware, disk replacement       | **Hardware & Datacenter Ops**                     | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`         |
+| Cloud-managed etcd / control plane (e.g., EKS, GKE) | **Platform Engineering** → cloud provider support | Platform Eng opens the provider ticket                 |
 
 **Boundary:** etcd is exclusively owned by Platform Engineering — no other team should touch etcd directly. This is a full Platform Engineering escalation from the moment the alert fires. If the alert is caused by disk hardware on the control plane node, Platform Engineering coordinates with Hardware & Datacenter Ops but remains the incident commander. etcd disaster recovery (quorum loss) requires the most senior available Platform Engineering staff — do not attempt without explicit authorization.
 

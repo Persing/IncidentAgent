@@ -81,12 +81,12 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application code, dependency config, rollback decision | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Downstream service (if dependency is failing) | **Owning team of that dependency** | Check `CODEOWNERS` for the dependency |
-| Cluster health, ingress, infrastructure | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Database-caused errors | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability` |
+| Layer                                                  | Team                                 | Contact                                                |
+|--------------------------------------------------------|--------------------------------------|--------------------------------------------------------|
+| Application code, dependency config, rollback decision | **Application Team**                 | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Downstream service (if dependency is failing)          | **Owning team of that dependency**   | Check `CODEOWNERS` for the dependency                  |
+| Cluster health, ingress, infrastructure                | **Platform Engineering**             | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Database-caused errors                                 | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability`       |
 
 **Boundary:** Application teams own the decision to roll back and must lead the initial triage. If the error root cause is in a dependency they don't own, they loop in that dependency's team — but they remain the incident commander for their own SLO. If the error is caused by a data consistency issue, do not attempt to fix the data without DRE involvement. Security-related error patterns (auth failures from unexpected IPs) should be flagged to Security Engineering immediately, even if they look like application errors.
 

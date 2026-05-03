@@ -16,7 +16,7 @@ Connection pool exhaustion occurs when all connections in the application's pool
 - Sudden traffic spike with insufficient pool size configured
 - Long-running transaction (possibly from a batch job or a transaction left open)
 - Database server overloaded — queries are slow, connections pile up waiting
-- A deploy that increased the number of application replicas without updating the pool size, overwhelming the DB's max_connections
+- A deployment that increased the number of application replicas without updating the pool size, overwhelming the DB's max_connections
 - PgBouncer or other connection pooler is unhealthy or misconfigured
 
 ## Diagnostic Steps
@@ -51,7 +51,7 @@ Connection pool exhaustion occurs when all connections in the application's pool
    psql -p 6432 -U pgbouncer pgbouncer -c "SHOW POOLS;"
    psql -p 6432 -U pgbouncer pgbouncer -c "SHOW CLIENTS;"
    ```
-6. Check application logs for connection acquisition timeout errors and timestamps to correlate with a deploy or traffic event.
+6. Check application logs for connection acquisition timeout errors and timestamps to correlate with a deployment or traffic event.
 
 ## Resolution Steps
 1. **Immediate — kill long-running queries holding connections:**
@@ -84,11 +84,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application connection pool config, connection lifecycle | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| PgBouncer / connection pooler infrastructure | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability` |
-| Database server health, max_connections config | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability` |
+| Layer                                                    | Team                                 | Contact                                             |
+|----------------------------------------------------------|--------------------------------------|-----------------------------------------------------|
+| Application connection pool config, connection lifecycle | **Application Team**                 | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| PgBouncer / connection pooler infrastructure             | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability`    |
+| Database server health, max_connections config           | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability`    |
 
 **Boundary:** Application teams own their pool configuration (`pool_size`, `max_overflow`, connection timeouts) and connection lifecycle in code. Database Reliability Engineering owns the database server and connection pooler infrastructure. Terminating long-running queries in production requires DRE sign-off unless you have explicit on-call authorization to do so — a query may be critical to another team's workflow. Changes to `max_connections` on the database server must go through DRE.
 

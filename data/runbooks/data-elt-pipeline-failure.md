@@ -77,17 +77,17 @@ An ELT (Extract, Load, Transform) pipeline failure means a scheduled data job ha
 Escalate to the on-call engineer if:
 - The pipeline has been failing for longer than its SLA window and downstream consumers are impacted
 - Data was written incorrectly (wrong data in the output table) — requires investigation before re-running
-- The scheduler is down and you do not have access to restart it
+- The scheduler is down, and you do not have access to restart it
 - A schema change broke multiple pipelines simultaneously
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Pipeline code, DAG definitions, scheduling config | **Data Engineering** | Slack: `#data-oncall` · PD: `data-engineering` |
-| Scheduler infrastructure (Airflow, Prefect cluster) | **Data Engineering** | Slack: `#data-oncall` · PD: `data-engineering` |
-| Source system schema or data changes | **Application Team** (source system owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Destination database / data warehouse | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability` |
+| Layer                                               | Team                                       | Contact                                             |
+|-----------------------------------------------------|--------------------------------------------|-----------------------------------------------------|
+| Pipeline code, DAG definitions, scheduling config   | **Data Engineering**                       | Slack: `#data-oncall` · PD: `data-engineering`      |
+| Scheduler infrastructure (Airflow, Prefect cluster) | **Data Engineering**                       | Slack: `#data-oncall` · PD: `data-engineering`      |
+| Source system schema or data changes                | **Application Team** (source system owner) | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Destination database / data warehouse               | **Database Reliability Engineering**       | Slack: `#db-oncall` · PD: `database-reliability`    |
 
 **Boundary:** Data Engineering owns the pipeline code and scheduler. If the failure is caused by an upstream source system changing schema or emitting bad data, that is the source team's responsibility — Data Engineering coordinates the fix but cannot unilaterally modify the source. If the destination database is the failure point (connection refused, schema mismatch at the load layer), loop in Database Reliability Engineering. Data Engineering should not run manual queries in production databases without DRE oversight.
 

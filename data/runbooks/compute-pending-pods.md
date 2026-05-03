@@ -80,11 +80,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Pod spec (node selector, affinity, tolerations, resource requests) | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Cluster capacity, autoscaler, node taints, node labels | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| GPU node provisioning and capacity | **ML Infrastructure** (GPU pool) or **Hardware & Datacenter Ops** | Slack: `#ml-infra-oncall` or `#dc-ops-oncall` |
+| Layer                                                              | Team                                                              | Contact                                                |
+|--------------------------------------------------------------------|-------------------------------------------------------------------|--------------------------------------------------------|
+| Pod spec (node selector, affinity, tolerations, resource requests) | **Application Team**                                              | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Cluster capacity, autoscaler, node taints, node labels             | **Platform Engineering**                                          | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| GPU node provisioning and capacity                                 | **ML Infrastructure** (GPU pool) or **Hardware & Datacenter Ops** | Slack: `#ml-infra-oncall` or `#dc-ops-oncall`          |
 
 **Boundary:** If the pod spec is the problem (wrong node selector, missing toleration), that is the application team's fix. If the cluster has no nodes that satisfy any reasonable pod spec (capacity exhausted, autoscaler broken), that is Platform Engineering's problem. GPU capacity planning is shared between ML Infrastructure (which manages the GPU pool configuration) and Hardware & Datacenter Ops (which provisions physical GPU nodes).
 

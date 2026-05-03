@@ -78,11 +78,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Replication topology, replica provisioning, WAL config | **Database Reliability Engineering** | Slack: `#db-oncall` · PD: `database-reliability` |
-| Application read routing (which replica to use) | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Replica host hardware or instance | **Hardware & Datacenter Ops** (bare-metal) or cloud provider | Slack: `#dc-ops-oncall` or provider support via DRE |
+| Layer                                                  | Team                                                         | Contact                                             |
+|--------------------------------------------------------|--------------------------------------------------------------|-----------------------------------------------------|
+| Replication topology, replica provisioning, WAL config | **Database Reliability Engineering**                         | Slack: `#db-oncall` · PD: `database-reliability`    |
+| Application read routing (which replica to use)        | **Application Team**                                         | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Replica host hardware or instance                      | **Hardware & Datacenter Ops** (bare-metal) or cloud provider | Slack: `#dc-ops-oncall` or provider support via DRE |
 
 **Boundary:** Database Reliability Engineering owns the replication topology and is the decision authority for routing reads back to the primary. Application teams own which replica endpoint they connect to — switching from replica to primary must be coordinated with DRE to avoid overloading the primary. Do not scale up the replica instance or modify replication configuration without DRE involvement.
 

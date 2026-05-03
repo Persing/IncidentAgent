@@ -80,11 +80,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Inference capacity, scaling policy, queue config | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
-| GPU node provisioning (adding capacity) | **Hardware & Datacenter Ops** (bare-metal) or cloud autoscaler via **ML Infrastructure** | Slack: `#dc-ops-oncall` or `#ml-infra-oncall` |
-| API rate limiting, client request rate | **Application Team** (API consumer) or **Platform Engineering** (gateway) | Depends on where rate limiting is applied |
+| Layer                                            | Team                                                                                     | Contact                                             |
+|--------------------------------------------------|------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| Inference capacity, scaling policy, queue config | **ML Infrastructure**                                                                    | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| GPU node provisioning (adding capacity)          | **Hardware & Datacenter Ops** (bare-metal) or cloud autoscaler via **ML Infrastructure** | Slack: `#dc-ops-oncall` or `#ml-infra-oncall`       |
+| API rate limiting, client request rate           | **Application Team** (API consumer) or **Platform Engineering** (gateway)                | Depends on where rate limiting is applied           |
 
 **Boundary:** ML Infrastructure owns queue depth and is responsible for capacity decisions. Adding GPU capacity requires coordination: ML Infrastructure requests nodes from Hardware & Datacenter Ops (bare-metal) or provisions cloud instances (they own that workflow). Rate limiting to protect the queue is ML Infrastructure's call at the inference API layer, or Platform Engineering's call at the ingress/gateway layer.
 

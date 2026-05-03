@@ -83,11 +83,11 @@ Escalate to the on-call engineer or platform/mesh team if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Istio control plane (istiod), mesh-wide policy | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Service-specific AuthorizationPolicy, DestinationRule | **Application Team** (policy author) | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| mTLS PKI / internal CA backing the mesh | **Security Engineering** | Slack: `#security-oncall` · PD: `security-engineering` |
+| Layer                                                 | Team                                 | Contact                                                |
+|-------------------------------------------------------|--------------------------------------|--------------------------------------------------------|
+| Istio control plane (istiod), mesh-wide policy        | **Platform Engineering**             | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Service-specific AuthorizationPolicy, DestinationRule | **Application Team** (policy author) | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| mTLS PKI / internal CA backing the mesh               | **Security Engineering**             | Slack: `#security-oncall` · PD: `security-engineering` |
 
 **Boundary:** Platform Engineering owns istiod and mesh-wide configuration (PeerAuthentication defaults, global traffic policy). Application teams own policies they wrote for their own services (AuthorizationPolicy, DestinationRule). If a policy change by one application team is breaking traffic to another team's service, the policy author's team is responsible for the fix, but Platform Engineering may need to mediate and temporarily override the policy to restore service.
 

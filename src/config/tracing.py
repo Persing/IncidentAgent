@@ -80,9 +80,9 @@ def build_run_config(
 
     base_metadata: dict = {
         "embedding_provider": settings.embedding_provider,
-        "embedding_model": _embedding_model(settings),
+        "embedding_model": settings.active_embedding_model,
         "llm_provider": settings.llm_provider,
-        "llm_model": _llm_model(settings),
+        "llm_model": settings.active_llm_model,
     }
 
     return RunnableConfig(
@@ -90,26 +90,3 @@ def build_run_config(
         tags=provider_tags + (tags or []),
         metadata={**base_metadata, **(metadata or {})},
     )
-
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
-
-def _embedding_model(settings: Settings) -> str:
-    if settings.embedding_provider == "openai":
-        return settings.openai_embedding_model
-    if settings.embedding_provider == "ollama":
-        return settings.ollama_embedding_model
-    if settings.embedding_provider == "huggingface":
-        return settings.hf_embedding_model
-    return "unknown"
-
-
-def _llm_model(settings: Settings) -> str:
-    if settings.llm_provider == "openai":
-        return settings.openai_llm_model
-    if settings.llm_provider == "anthropic":
-        return settings.anthropic_model
-    if settings.llm_provider == "ollama":
-        return settings.ollama_llm_model
-    return "unknown"

@@ -84,11 +84,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Inference serving process, vLLM config, liveness probes | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
-| GPU hardware health, driver state, NCCL interconnect | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
-| Kubernetes pod scheduling and restart policy | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Layer                                                   | Team                          | Contact                                                |
+|---------------------------------------------------------|-------------------------------|--------------------------------------------------------|
+| Inference serving process, vLLM config, liveness probes | **ML Infrastructure**         | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure`    |
+| GPU hardware health, driver state, NCCL interconnect    | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`         |
+| Kubernetes pod scheduling and restart policy            | **Platform Engineering**      | Slack: `#platform-oncall` · PD: `platform-engineering` |
 
 **Boundary:** ML Infrastructure owns the inference serving layer end-to-end and is incident commander. Hardware & Datacenter Ops is called in when the crash trace points to a hardware-level failure (GPU error codes, NVLink failure, thermal event). If a node-level cordon or drain is needed to recover, ML Infrastructure coordinates with Platform Engineering to execute it.
 

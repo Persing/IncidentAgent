@@ -84,11 +84,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Node disk management, kubelet eviction config, image GC | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Application log volume, log rotation config | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Physical disk hardware, disk replacement | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
+| Layer                                                   | Team                          | Contact                                                |
+|---------------------------------------------------------|-------------------------------|--------------------------------------------------------|
+| Node disk management, kubelet eviction config, image GC | **Platform Engineering**      | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Application log volume, log rotation config             | **Application Team**          | See service `CODEOWNERS` · Slack: `#team-<service>`    |
+| Physical disk hardware, disk replacement                | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`         |
 
 **Boundary:** Platform Engineering owns node-level disk configuration (kubelet log rotation, image GC thresholds, eviction settings) and is first responder for disk pressure alerts. The root cause often traces to an application team's logging behavior (no rotation, debug logging left on) — once identified, the fix belongs to that application team. Physical disk failures or replacements are Hardware & Datacenter Ops territory.
 

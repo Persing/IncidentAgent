@@ -85,11 +85,11 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Ingress controller (nginx, Traefik) config and health | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Backend application pods and readiness | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| External load balancer, cloud-managed LB | **Network / Infrastructure** | Slack: `#network-oncall` · PD: `network-infrastructure` |
+| Layer                                                 | Team                         | Contact                                                 |
+|-------------------------------------------------------|------------------------------|---------------------------------------------------------|
+| Ingress controller (nginx, Traefik) config and health | **Platform Engineering**     | Slack: `#platform-oncall` · PD: `platform-engineering`  |
+| Backend application pods and readiness                | **Application Team**         | See service `CODEOWNERS` · Slack: `#team-<service>`     |
+| External load balancer, cloud-managed LB              | **Network / Infrastructure** | Slack: `#network-oncall` · PD: `network-infrastructure` |
 
 **Boundary:** Platform Engineering owns the ingress controller itself. Application teams own their backend pods. The first step is always to determine whether the 5xx originates at the ingress (ingress controller issue) or is the ingress forwarding a 5xx from the backend (application issue). Check ingress logs to see whether the upstream responded or whether the ingress itself generated the error. External load balancers sitting in front of the ingress are Network / Infrastructure territory.
 

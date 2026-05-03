@@ -76,12 +76,12 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| Application timeout config, connection pool, retry logic | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
-| Kubernetes networking (CNI, kube-proxy, network policy) | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| VPC routing, security groups, firewall rules, cross-region paths | **Network / Infrastructure** | Slack: `#network-oncall` · PD: `network-infrastructure` |
-| Cloud provider network event | **Platform Engineering** → cloud provider support | Platform Eng opens provider ticket |
+| Layer                                                            | Team                                              | Contact                                                 |
+|------------------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------|
+| Application timeout config, connection pool, retry logic         | **Application Team**                              | See service `CODEOWNERS` · Slack: `#team-<service>`     |
+| Kubernetes networking (CNI, kube-proxy, network policy)          | **Platform Engineering**                          | Slack: `#platform-oncall` · PD: `platform-engineering`  |
+| VPC routing, security groups, firewall rules, cross-region paths | **Network / Infrastructure**                      | Slack: `#network-oncall` · PD: `network-infrastructure` |
+| Cloud provider network event                                     | **Platform Engineering** → cloud provider support | Platform Eng opens provider ticket                      |
 
 **Boundary:** Timeouts are the most ambiguous alert — the ownership depends entirely on which layer the timeout occurs at. Application teams own their timeout configuration and client-side retry behavior. Platform Engineering owns cluster-level networking (CNI, network policy). Network / Infrastructure owns everything outside the cluster boundary. If raw TCP tests timeout (not just HTTP), the issue is below the application layer — escalate to Platform Engineering or Network / Infrastructure depending on whether it's intra-cluster or cross-cluster traffic.
 

@@ -38,6 +38,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import logging
 import time
@@ -48,7 +49,7 @@ import yaml
 
 from src.config.settings import Settings, get_settings
 from src.config.tracing import build_run_config
-from src.retrieval.retriever import RunbookRetriever
+from src.retrieval.retriever import FETCH_K, RunbookRetriever
 
 logger = logging.getLogger(__name__)
 
@@ -203,7 +204,7 @@ def run_eval(
         len(test_cases),
         k_values,
         settings.embedding_provider,
-        _embedding_model_name(settings),
+        settings.active_embedding_model,
         " +classify" if with_classify else "",
     )
 
@@ -305,8 +306,6 @@ def _aggregate(
     settings: Settings,
 ) -> EvalReport:
     """Aggregate per-case results into an EvalReport."""
-    import datetime
-
     n = len(cases)
 
     # Recall@k — fraction where primary is in top k
@@ -346,10 +345,14 @@ def _aggregate(
         by_category[cat] = _subset_stats(subset, max_k)
 
     return EvalReport(
-        timestamp=datetime.datetime.utcnow().isoformat(),
+        timestamp=(
+            datetime.datetime.fromtimestamp(time.time(), tz=datetime.timezone.utc)
+            .replace(tzinfo=None)
+            .isoformat(timespec="microseconds")
+        ),
         embedding_provider=settings.embedding_provider,
-        embedding_model=_embedding_model_name(settings),
-        fetch_k=20,   # matches FETCH_K in retriever
+        embedding_model=settings.active_embedding_model,
+        fetch_k=FETCH_K,
         return_k=max_k,
         total_cases=n,
         recall_at_k=recall_at_k,
@@ -374,16 +377,6 @@ def _subset_stats(cases: list[CaseResult], k: int) -> dict:
 def _normalise_runbook_name(name: str) -> str:
     """Strip .md extension so comparisons work regardless of how names are stored."""
     return name.removesuffix(".md")
-
-
-def _embedding_model_name(settings: Settings) -> str:
-    if settings.embedding_provider == "openai":
-        return settings.openai_embedding_model
-    elif settings.embedding_provider == "ollama":
-        return settings.ollama_embedding_model
-    elif settings.embedding_provider == "huggingface":
-        return settings.hf_embedding_model
-    return "unknown"
 
 
 # ── CLI ──────────────────────────────────────────────────────────────────────

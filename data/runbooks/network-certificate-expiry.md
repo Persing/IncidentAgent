@@ -83,12 +83,12 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| cert-manager, ACME configuration, cluster-wide cert policy | **Platform Engineering** | Slack: `#platform-oncall` · PD: `platform-engineering` |
-| Internal CA, mTLS certificates, PKI infrastructure | **Security Engineering** | Slack: `#security-oncall` · PD: `security-engineering` |
-| External load balancer certificates (cloud-managed) | **Platform Engineering** (configures) + cloud provider | Platform Eng owns the LB cert config |
-| Application-specific cert usage and secrets | **Application Team** | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Layer                                                      | Team                                                   | Contact                                                |
+|------------------------------------------------------------|--------------------------------------------------------|--------------------------------------------------------|
+| cert-manager, ACME configuration, cluster-wide cert policy | **Platform Engineering**                               | Slack: `#platform-oncall` · PD: `platform-engineering` |
+| Internal CA, mTLS certificates, PKI infrastructure         | **Security Engineering**                               | Slack: `#security-oncall` · PD: `security-engineering` |
+| External load balancer certificates (cloud-managed)        | **Platform Engineering** (configures) + cloud provider | Platform Eng owns the LB cert config                   |
+| Application-specific cert usage and secrets                | **Application Team**                                   | See service `CODEOWNERS` · Slack: `#team-<service>`    |
 
 **Boundary:** Platform Engineering owns cert-manager and the automation that rotates most certificates. Security Engineering owns the internal CA and any certificates that are part of the PKI/mTLS trust chain — do not rotate internal CA certs without Security Engineering involvement. For ACME (Let's Encrypt) failures, Platform Engineering is the first call. If the expired cert is part of the internal mTLS fabric (service-to-service trust), treat it as a Security Engineering incident from the start.
 

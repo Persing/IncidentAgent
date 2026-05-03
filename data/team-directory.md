@@ -12,11 +12,11 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Applications running inside pods, physical node hardware, cloud VPC/security groups, managed databases.
 
-| Channel | Purpose |
-|---|---|
-| Slack `#platform-oncall` | Immediate escalation — on-call is paged here |
-| Slack `#platform-engineering` | Non-urgent questions, follow-up |
-| PagerDuty `platform-engineering` | Direct page |
+| Channel                          | Purpose                                      |
+|----------------------------------|----------------------------------------------|
+| Slack `#platform-oncall`         | Immediate escalation — on-call is paged here |
+| Slack `#platform-engineering`    | Non-urgent questions, follow-up              |
+| PagerDuty `platform-engineering` | Direct page                                  |
 
 **On-call rotation:** 24/7. Acknowledge SLA: 5 minutes (critical), 15 minutes (high).
 
@@ -28,11 +28,11 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Kubernetes networking (CNI, kube-proxy, CoreDNS) — that is Platform Engineering.
 
-| Channel | Purpose |
-|---|---|
-| Slack `#network-oncall` | Immediate escalation |
-| Slack `#network-infra` | Non-urgent |
-| PagerDuty `network-infrastructure` | Direct page |
+| Channel                            | Purpose              |
+|------------------------------------|----------------------|
+| Slack `#network-oncall`            | Immediate escalation |
+| Slack `#network-infra`             | Non-urgent           |
+| PagerDuty `network-infrastructure` | Direct page          |
 
 **On-call rotation:** 24/7. Acknowledge SLA: 10 minutes (critical), 30 minutes (high).
 
@@ -44,12 +44,12 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Software running on nodes, Kubernetes, cloud-hosted instances (for cloud instances, use cloud provider support).
 
-| Channel | Purpose |
-|---|---|
-| Slack `#dc-ops-oncall` | Immediate escalation for hardware emergencies |
-| Slack `#dc-ops` | Non-urgent hardware requests |
-| PagerDuty `datacenter-ops` | Direct page |
-| OOB Ticket Portal | For non-emergency hardware replacement requests |
+| Channel                    | Purpose                                         |
+|----------------------------|-------------------------------------------------|
+| Slack `#dc-ops-oncall`     | Immediate escalation for hardware emergencies   |
+| Slack `#dc-ops`            | Non-urgent hardware requests                    |
+| PagerDuty `datacenter-ops` | Direct page                                     |
+| OOB Ticket Portal          | For non-emergency hardware replacement requests |
 
 **On-call rotation:** 24/7 for critical hardware failures. Business hours for non-critical.
 
@@ -61,11 +61,11 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Application-level queries or ORM usage — those belong to the application team. Connection pool *configuration* inside the application is the application team's responsibility.
 
-| Channel | Purpose |
-|---|---|
-| Slack `#db-oncall` | Immediate escalation |
-| Slack `#db-reliability` | Non-urgent, performance questions |
-| PagerDuty `database-reliability` | Direct page |
+| Channel                          | Purpose                           |
+|----------------------------------|-----------------------------------|
+| Slack `#db-oncall`               | Immediate escalation              |
+| Slack `#db-reliability`          | Non-urgent, performance questions |
+| PagerDuty `database-reliability` | Direct page                       |
 
 **On-call rotation:** 24/7. Acknowledge SLA: 5 minutes (critical), 15 minutes (high).
 
@@ -77,11 +77,11 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Application-level Kafka consumers — those belong to the consuming application team.
 
-| Channel | Purpose |
-|---|---|
-| Slack `#data-oncall` | Immediate escalation for pipeline/Kafka emergencies |
-| Slack `#data-engineering` | Non-urgent, pipeline questions |
-| PagerDuty `data-engineering` | Direct page |
+| Channel                      | Purpose                                             |
+|------------------------------|-----------------------------------------------------|
+| Slack `#data-oncall`         | Immediate escalation for pipeline/Kafka emergencies |
+| Slack `#data-engineering`    | Non-urgent, pipeline questions                      |
+| PagerDuty `data-engineering` | Direct page                                         |
 
 **On-call rotation:** Business hours primary. After-hours on-call for critical pipelines only.
 
@@ -93,11 +93,11 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Physical GPU hardware (Hardware & Datacenter Ops), model training pipelines (ML Platform/Research), application-layer LLM API clients.
 
-| Channel | Purpose |
-|---|---|
-| Slack `#ml-infra-oncall` | Immediate escalation for inference outages |
-| Slack `#ml-infrastructure` | Non-urgent, config questions |
-| PagerDuty `ml-infrastructure` | Direct page |
+| Channel                       | Purpose                                    |
+|-------------------------------|--------------------------------------------|
+| Slack `#ml-infra-oncall`      | Immediate escalation for inference outages |
+| Slack `#ml-infrastructure`    | Non-urgent, config questions               |
+| PagerDuty `ml-infrastructure` | Direct page                                |
 
 **On-call rotation:** 24/7. Acknowledge SLA: 5 minutes (critical), 15 minutes (high).
 
@@ -109,11 +109,11 @@ This document defines team ownership, scope boundaries, and contact information 
 
 **Does NOT own:** Application-level secret usage — application teams are responsible for how they consume secrets.
 
-| Channel | Purpose |
-|---|---|
-| Slack `#security-oncall` | Immediate escalation for security incidents or cert emergencies |
-| Slack `#security-engineering` | Non-urgent, policy questions |
-| PagerDuty `security-engineering` | Direct page |
+| Channel                          | Purpose                                                         |
+|----------------------------------|-----------------------------------------------------------------|
+| Slack `#security-oncall`         | Immediate escalation for security incidents or cert emergencies |
+| Slack `#security-engineering`    | Non-urgent, policy questions                                    |
+| PagerDuty `security-engineering` | Direct page                                                     |
 
 **On-call rotation:** 24/7 for security incidents. Business hours for certificate rotation requests.
 

@@ -77,6 +77,26 @@ class Settings(BaseSettings):
     langchain_api_key: str = Field(default="", repr=False)
     langchain_project: str = "incident-triage-agent"
 
+    @property
+    def active_embedding_model(self) -> str:
+        if self.embedding_provider == "openai":
+            return self.openai_embedding_model
+        if self.embedding_provider == "ollama":
+            return self.ollama_embedding_model
+        if self.embedding_provider == "huggingface":
+            return self.hf_embedding_model
+        return "unknown"
+
+    @property
+    def active_llm_model(self) -> str:
+        if self.llm_provider == "openai":
+            return self.openai_llm_model
+        if self.llm_provider == "anthropic":
+            return self.anthropic_model
+        if self.llm_provider == "ollama":
+            return self.ollama_llm_model
+        return "unknown"
+
     @model_validator(mode="after")
     def _validate_provider_keys(self) -> Settings:
         """Fail early with a clear message if a required API key is missing."""

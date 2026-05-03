@@ -78,12 +78,12 @@ Escalate to the on-call engineer if:
 
 ## Ownership
 
-| Layer | Team | Contact |
-|---|---|---|
-| vLLM/TGI configuration, gpu_memory_utilization, KV cache tuning | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
-| GPU node pool, GPU scheduling, CUDA driver version | **ML Infrastructure** | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
-| Physical GPU hardware, NVLink, cooling | **Hardware & Datacenter Ops** | Slack: `#dc-ops-oncall` · PD: `datacenter-ops` |
-| Request payload size / context length (if client-driven) | **Application Team** (API consumer) | See service `CODEOWNERS` · Slack: `#team-<service>` |
+| Layer                                                           | Team                                | Contact                                             |
+|-----------------------------------------------------------------|-------------------------------------|-----------------------------------------------------|
+| vLLM/TGI configuration, gpu_memory_utilization, KV cache tuning | **ML Infrastructure**               | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| GPU node pool, GPU scheduling, CUDA driver version              | **ML Infrastructure**               | Slack: `#ml-infra-oncall` · PD: `ml-infrastructure` |
+| Physical GPU hardware, NVLink, cooling                          | **Hardware & Datacenter Ops**       | Slack: `#dc-ops-oncall` · PD: `datacenter-ops`      |
+| Request payload size / context length (if client-driven)        | **Application Team** (API consumer) | See service `CODEOWNERS` · Slack: `#team-<service>` |
 
 **Boundary:** ML Infrastructure owns the inference serving configuration and is first responder for GPU OOM. If the OOM is caused by a client sending abnormally large requests, coordinate with the application team consuming the inference API to add payload validation. Physical GPU hardware failures (GPU not enumerated, NVLink errors, thermal shutdown) escalate to Hardware & Datacenter Ops — do not attempt physical intervention.
 

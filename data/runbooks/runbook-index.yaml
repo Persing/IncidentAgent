@@ -97,7 +97,7 @@ runbooks:
     title: "Ingress 5xx — Ingress Returning 502/503/504 to External Traffic"
     family: networking
     severity: high
-    tags: [ingress, 502, 503, 504, nginx, backend]
+    tags: [ "ingress", "502", "503", "504", "nginx", "backend" ]
     description: "Ingress returning 5xx; covers no healthy backends (503), backend crashes (502), and backend timeout (504)."
 
   - file: network-service-mesh-error.md
