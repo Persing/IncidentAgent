@@ -96,6 +96,24 @@ The classify node (`START → classify → retrieve → generate`) still ships a
 
 ---
 
+## Quick start — Docker
+
+The fastest way to run everything (API + Streamlit demo) with no Python setup required:
+
+```bash
+cp .env.example .env
+# Edit .env — add OPENAI_API_KEY or ANTHROPIC_API_KEY
+docker compose up
+```
+
+This builds one image, runs ingestion once to populate ChromaDB, then starts:
+- **API** at `http://localhost:8000` (Swagger UI at `/docs`)
+- **Demo UI** at `http://localhost:8501`
+
+> **Ollama users:** Ollama GPU passthrough varies too much by host OS to bundle reliably in Compose. Run Ollama locally (`ollama serve`), set `OLLAMA_BASE_URL=http://host.docker.internal:11434` in `.env`, then `docker compose up`.
+
+---
+
 ## Setup
 
 ### Prerequisites
@@ -323,6 +341,8 @@ incident-triage-agent/
 │   └── app.py                  # Streamlit demo UI — select a scenario, run live triage
 ├── results/                    # Eval output JSON files (gitignored)
 ├── .env.example                # All config options documented
+├── Dockerfile                  # Single image — API and demo share the same build
+├── docker-compose.yml          # ingest → api → demo; ChromaDB persisted as a named volume
 ├── pyproject.toml              # Optional dep groups per provider
 └── README.md
 ```

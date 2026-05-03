@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import logging
 
+import os
+
 import requests
 import streamlit as st
 
@@ -22,7 +24,7 @@ from src.config.logging_config import configure_logging
 configure_logging("DEBUG")
 logger = logging.getLogger(__name__)
 
-API_BASE = "http://localhost:8000"
+API_BASE = os.environ.get("API_BASE", "http://localhost:8000")
 
 st.set_page_config(page_title="Incident Triage Playground", layout="wide")
 

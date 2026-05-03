@@ -1,0 +1,46 @@
+services:
+
+  # ── Ingestion ────────────────────────────────────────────────────────────────
+  # Runs once to populate ChromaDB from the runbook corpus.
+  # Safe to re-run — upserts by deterministic chunk ID, no duplicates.
+  ingest:
+    build: .
+    command: python -m src.ingestion.loader
+    env_file: .env
+    volumes:
+      - chroma_data:/app/data/chroma_db
+    restart: "no"
+
+  # ── API ──────────────────────────────────────────────────────────────────────
+  api:
+    build: .
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment:
+      CHROMA_PERSIST_DIR: /app/data/chroma_db
+    volumes:
+      - chroma_data:/app/data/chroma_db
+    depends_on:
+      ingest:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # ── Demo UI ──────────────────────────────────────────────────────────────────
+  demo:
+    build: .
+    command: streamlit run demo/app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    env_file: .env
+    environment:
+      API_BASE: http://api:8000
+    volumes:
+      - ./demo:/app/demo
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  chroma_data:
