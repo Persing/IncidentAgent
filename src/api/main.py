@@ -105,7 +105,7 @@ class RunbookSummary(BaseModel):
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(api_app: FastAPI):
     """
     FastAPI lifespan context manager.
 
@@ -131,8 +131,8 @@ async def lifespan(app: FastAPI):
         logger.error("Failed to build triage graph at startup: %s", e)
         raise
 
-    app.state.graph = graph
-    app.state.settings = settings
+    api_app.state.graph = graph
+    api_app.state.settings = settings
 
     logger.info("Triage agent ready.")
     yield
@@ -220,11 +220,11 @@ async def triage(request_body: TriageRequest, response: Response) -> TriageRespo
             graph=graph,
             run_config=run_config,
         )
-    except Exception as e:
-        logger.exception("Triage failed for query: %r", request_body.query[:80])
+    except Exception:
+        logger.exception("Triage failed request_id=%s query=%r", request_id, request_body.query[:80])
         raise HTTPException(
             status_code=503,
-            detail=f"Triage agent error: {type(e).__name__}: {e}",
+            detail=f"Triage agent unavailable. Reference ID: {request_id}",
         )
 
     latency_ms = round((time.perf_counter() - t0) * 1000, 1)
@@ -274,7 +274,7 @@ async def health() -> HealthResponse:
 
     Returns 200 if the graph was built successfully at startup.
     The graph being warm means ChromaDB, the BM25 index, and the LLM
-    provider connection have all been initialised.
+    provider connection have all been initialized.
     """
     settings: Settings = app.state.settings
     runbooks_dir = Path(settings.runbooks_dir)
@@ -299,7 +299,7 @@ async def list_runbooks() -> list[RunbookSummary]:
     """
     List all runbooks in the indexed corpus with their family and severity.
 
-    Reads the Tags section from each markdown file. Useful for understanding
+    Reads the Tags section from each Markdown file. Useful for understanding
     what the agent knows about and for debugging retrieval misses.
     """
     import re

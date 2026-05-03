@@ -5,10 +5,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
-
 from src.ingestion.loader import (
     IngestionStats,
     RunbookChunk,
@@ -103,28 +99,30 @@ class TestSplitBySections:
 # ── RunbookChunk ──────────────────────────────────────────────────────────────
 
 
+def _make_chunk(runbook="compute-crashloop", section="Diagnostic Steps"):
+    return RunbookChunk(
+        runbook_name=runbook,
+        section_name=section,
+        content="## Diagnostic Steps\n\nkubectl logs --previous",
+        family="compute",
+        severity="high",
+        services="any",
+        source_path="data/runbooks/compute-crashloop.md",
+    )
+
+
 class TestRunbookChunk:
-    def _make_chunk(self, runbook="compute-crashloop", section="Diagnostic Steps"):
-        return RunbookChunk(
-            runbook_name=runbook,
-            section_name=section,
-            content="## Diagnostic Steps\n\nkubectl logs --previous",
-            family="compute",
-            severity="high",
-            services="any",
-            source_path="data/runbooks/compute-crashloop.md",
-        )
 
     def test_chunk_id_format(self):
-        chunk = self._make_chunk()
+        chunk = _make_chunk()
         assert chunk.chunk_id == "compute-crashloop__diagnostic_steps"
 
     def test_chunk_id_slugify(self):
-        chunk = self._make_chunk(section="Alert Signatures & Examples")
+        chunk = _make_chunk(section="Alert Signatures & Examples")
         assert chunk.chunk_id == "compute-crashloop__alert_signatures_examples"
 
     def test_to_document_metadata(self):
-        chunk = self._make_chunk()
+        chunk = _make_chunk()
         doc = chunk.to_document()
         assert doc.metadata["runbook"] == "compute-crashloop"
         assert doc.metadata["family"] == "compute"
@@ -132,7 +130,7 @@ class TestRunbookChunk:
         assert doc.metadata["chunk_id"] == chunk.chunk_id
 
     def test_to_document_page_content(self):
-        chunk = self._make_chunk()
+        chunk = _make_chunk()
         doc = chunk.to_document()
         assert "kubectl logs" in doc.page_content
 

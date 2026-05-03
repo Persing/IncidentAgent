@@ -4,7 +4,7 @@
 """
 Runbook ingestion pipeline.
 
-Loads markdown runbooks from disk, splits them into section-level chunks,
+Loads Markdown runbooks from disk, splits them into section-level chunks,
 embeds each chunk, and stores the result in ChromaDB.
 
 Chunking strategy: split on ## headers rather than by token count.
@@ -131,7 +131,7 @@ def _parse_tags(content: str) -> dict[str, str]:
 
 def _split_by_sections(markdown: str) -> list[tuple[str, str]]:
     """
-    Split a markdown document into (section_name, section_body) pairs.
+    Split a Markdown document into (section_name, section_body) pairs.
 
     Sections are delimited by ## headers. The document title (# header)
     is treated as a special "Title" section so it's included in retrieval.
@@ -171,7 +171,7 @@ def _split_by_sections(markdown: str) -> list[tuple[str, str]]:
 
 def _parse_runbook(path: Path) -> Iterator[RunbookChunk]:
     """
-    Parse a single runbook markdown file into RunbookChunk objects.
+    Parse a single runbook Markdown file into RunbookChunk objects.
 
     Yields one chunk per non-empty section (excluding ## Tags).
     """

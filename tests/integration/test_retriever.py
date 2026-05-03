@@ -10,7 +10,7 @@ The tests verify the RRF fusion logic, family filtering, and result shaping.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from langchain_core.documents import Document

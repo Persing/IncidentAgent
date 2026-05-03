@@ -3,8 +3,6 @@
 
 """Unit tests for Reciprocal Rank Fusion."""
 
-import pytest
-
 from src.retrieval.bm25_index import reciprocal_rank_fusion
 
 

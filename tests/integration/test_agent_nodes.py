@@ -15,7 +15,6 @@ import pytest
 
 from src.agent.classify import (
     ClassificationResult,
-    IncidentFamily,
     make_classify_node,
 )
 from src.agent.triage_agent import make_generate_node, make_retrieve_node

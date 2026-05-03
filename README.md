@@ -46,18 +46,18 @@ Alert text or incident description
 
 Phase 2 is complete and working end-to-end:
 
-| Component | Status | Notes |
-|---|---|---|
-| Runbook corpus | ✅ | 28 runbooks, 7 incident families, 8-section schema |
-| Ingestion pipeline | ✅ | Section-level chunking, idempotent upsert to ChromaDB |
-| Retrieval | ✅ | Fetch-wide / deduplicate-by-best, 50ms avg latency |
-| Provider abstraction | ✅ | OpenAI / Anthropic / Ollama — swap via `.env` |
-| Triage agent | ✅ | LangGraph three-node graph (classify → retrieve → generate), structured output |
-| Eval harness | ✅ | Recall@k and MRR across 24 labeled test cases |
-| Hybrid retrieval (BM25 + semantic) | ✅ | RRF fusion, Recall@5 0.917→0.958, MRR 0.802→0.889 |
-| FastAPI layer | ✅ | `POST /triage`, `GET /health`, `GET /runbooks` |
-| LangSmith tracing | ✅ | Per-request metadata, provider tags, eval separation |
-| LangGraph classify node | ✅ | Phase 2 graph: classify → retrieve → generate. Recall@5 1.000, MRR 0.931 |
+| Component                          | Status | Notes                                                                          |
+|------------------------------------|--------|--------------------------------------------------------------------------------|
+| Runbook corpus                     | ✅      | 28 runbooks, 7 incident families, 8-section schema                             |
+| Ingestion pipeline                 | ✅      | Section-level chunking, idempotent upsert to ChromaDB                          |
+| Retrieval                          | ✅      | Fetch-wide / deduplicate-by-best, 50ms avg latency                             |
+| Provider abstraction               | ✅      | OpenAI / Anthropic / Ollama — swap via `.env`                                  |
+| Triage agent                       | ✅      | LangGraph three-node graph (classify → retrieve → generate), structured output |
+| Eval harness                       | ✅      | Recall@k and MRR across 24 labeled test cases                                  |
+| Hybrid retrieval (BM25 + semantic) | ✅      | RRF fusion, Recall@5 0.917→0.958, MRR 0.802→0.889                              |
+| FastAPI layer                      | ✅      | `POST /triage`, `GET /health`, `GET /runbooks`                                 |
+| LangSmith tracing                  | ✅      | Per-request metadata, provider tags, eval separation                           |
+| LangGraph classify node            | ✅      | Phase 2 graph: classify → retrieve → generate. Recall@5 1.000, MRR 0.931       |
 
 ---
 
@@ -77,12 +77,12 @@ Avg latency       49ms      96ms     50ms
 
 **By category (Phase 2 — no misses):**
 
-| Category | n | Recall@5 | MRR | Notes |
-|---|---|---|---|---|
-| direct | 5 | 1.000 | 1.000 | Explicit alert names / metric labels |
-| multi_runbook | 6 | 1.000 | 0.917 | Co-triggered incidents, multiple expected runbooks |
-| confusable | 7 | 1.000 | 0.833 | Similar-sounding alerts, different correct runbook |
-| semantic | 6 | 1.000 | 1.000 | User-language descriptions, no k8s terminology ← was 0.833 |
+| Category      | n | Recall@5 | MRR   | Notes                                                      |
+|---------------|---|----------|-------|------------------------------------------------------------|
+| direct        | 5 | 1.000    | 1.000 | Explicit alert names / metric labels                       |
+| multi_runbook | 6 | 1.000    | 0.917 | Co-triggered incidents, multiple expected runbooks         |
+| confusable    | 7 | 1.000    | 0.833 | Similar-sounding alerts, different correct runbook         |
+| semantic      | 6 | 1.000    | 1.000 | User-language descriptions, no k8s terminology ← was 0.833 |
 
 **How Phase 2 eliminated the last miss** (`tc_005` — "Scoring service unresponsive, health checks timing out"):
 
@@ -365,7 +365,7 @@ The fix: fetch `k=20` raw chunks, group by runbook name, keep the lowest-distanc
 
 ### Structured output over prose
 
-Every agent response is a `TriagePlan` Pydantic model with typed fields. This is not a stylistic choice — it is what a real system consuming this agent would need. Structured output is serialisable, diffable, and testable. Prose is none of those things.
+Every agent response is a `TriagePlan` Pydantic model with typed fields. This is not a stylistic choice — it is what a real system consuming this agent would need. Structured output is serializable, diffable, and testable. Prose is none of those things.
 
 ### Pluggable provider layer
 
@@ -392,15 +392,15 @@ The actual fix for `tc_005`, though, was a runbook content improvement: the comp
 
 The **Ownership** section is non-standard and intentional. It documents which team owns which layer of the incident, where the responsibility boundary is, and how to reach each team's on-call. This is the section an on-call engineer needs most under pressure and is almost always missing from demo runbooks.
 
-| Family | Runbooks | Examples |
-|---|---|---|
-| Compute | 6 | high-cpu, oom-killed, crashloop, node-not-ready, resource-quota, pending-pods |
-| Storage | 4 | disk-pressure, pvc-mount-failure, etcd-disk, log-volume-full |
-| Networking | 5 | dns-failure, timeout, certificate-expiry, ingress-502, service-mesh-error |
-| Data / Pipeline | 4 | kafka-consumer-lag, elt-pipeline-failure, db-connection-pool, db-replication-lag |
-| Inference / GPU | 5 | gpu-oom, worker-crash, model-load-failure, request-queue-depth, throughput-drop |
-| Deployment | 2 | stuck-rollout, image-pull-error |
-| API | 2 | api-latency-spike, api-error-rate-spike |
+| Family          | Runbooks | Examples                                                                         |
+|-----------------|----------|----------------------------------------------------------------------------------|
+| Compute         | 6        | high-cpu, oom-killed, crashloop, node-not-ready, resource-quota, pending-pods    |
+| Storage         | 4        | disk-pressure, pvc-mount-failure, etcd-disk, log-volume-full                     |
+| Networking      | 5        | dns-failure, timeout, certificate-expiry, ingress-502, service-mesh-error        |
+| Data / Pipeline | 4        | kafka-consumer-lag, elt-pipeline-failure, db-connection-pool, db-replication-lag |
+| Inference / GPU | 5        | gpu-oom, worker-crash, model-load-failure, request-queue-depth, throughput-drop  |
+| Deployment      | 2        | stuck-rollout, image-pull-error                                                  |
+| API             | 2        | api-latency-spike, api-error-rate-spike                                          |
 
 ---
 

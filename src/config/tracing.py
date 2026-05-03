@@ -60,7 +60,7 @@ def build_run_config(
                    and metadata automatically.
         run_name:  Display name for this run in the LangSmith UI.
                    Use descriptive names: "incident_triage", "eval_tc_001".
-        tags:      Additional tags beyond the auto-populated provider tags.
+        tags:      Additional tags beyond the autopopulated provider tags.
                    Useful for segmenting traffic: ["api"], ["evaluation"],
                    ["manual"].
         metadata:  Per-request key/value metadata. Common fields:
@@ -72,7 +72,7 @@ def build_run_config(
         A RunnableConfig ready to pass as the second argument to
         graph.invoke(state, config=...).
     """
-    # Auto-populate provider tags — makes it easy to filter by model in LangSmith
+    # Autopopulate provider tags — makes it easy to filter by model in LangSmith
     provider_tags = [
         f"embed:{settings.embedding_provider}",
         f"llm:{settings.llm_provider}",

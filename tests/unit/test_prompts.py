@@ -5,10 +5,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
-
 from src.agent.prompts import (
     Confidence,
     Severity,
@@ -68,40 +64,42 @@ class TestFormatRunbookContext:
 # ── TriagePlan schema ─────────────────────────────────────────────────────────
 
 
+def _valid_plan(**overrides):
+    defaults = dict(
+        incident_summary="A pod is crash-looping.",
+        severity=Severity.HIGH,
+        likely_cause="OOMKilled",
+        affected_components=["api-server"],
+        diagnostic_steps=["kubectl logs --previous"],
+        resolution_steps=["Increase memory limit."],
+        escalation_criteria=["Persists after fix."],
+        runbooks_referenced=["compute-crashloop"],
+        confidence=Confidence.HIGH,
+        confidence_reason="Exact match.",
+    )
+    defaults.update(overrides)
+    return TriagePlan(**defaults)
+
+
 class TestTriagePlanSchema:
-    def _valid_plan(self, **overrides):
-        defaults = dict(
-            incident_summary="A pod is crash-looping.",
-            severity=Severity.HIGH,
-            likely_cause="OOMKilled",
-            affected_components=["api-server"],
-            diagnostic_steps=["kubectl logs --previous"],
-            resolution_steps=["Increase memory limit."],
-            escalation_criteria=["Persists after fix."],
-            runbooks_referenced=["compute-crashloop"],
-            confidence=Confidence.HIGH,
-            confidence_reason="Exact match.",
-        )
-        defaults.update(overrides)
-        return TriagePlan(**defaults)
 
     def test_valid_plan_construction(self):
-        plan = self._valid_plan()
+        plan = _valid_plan()
         assert plan.severity == Severity.HIGH
         assert plan.confidence == Confidence.HIGH
 
     def test_severity_enum_values(self):
         for value in ("low", "medium", "high", "critical"):
-            plan = self._valid_plan(severity=Severity(value))
+            plan = _valid_plan(severity=Severity(value))
             assert plan.severity.value == value
 
     def test_confidence_enum_values(self):
         for value in ("low", "medium", "high"):
-            plan = self._valid_plan(confidence=Confidence(value))
+            plan = _valid_plan(confidence=Confidence(value))
             assert plan.confidence.value == value
 
     def test_lists_preserved(self):
-        plan = self._valid_plan(
+        plan = _valid_plan(
             diagnostic_steps=["step one", "step two"],
             resolution_steps=["fix one", "fix two"],
         )
@@ -109,7 +107,7 @@ class TestTriagePlanSchema:
         assert len(plan.resolution_steps) == 2
 
     def test_serialise_to_dict(self):
-        plan = self._valid_plan()
+        plan = _valid_plan()
         d = plan.model_dump()
         assert d["severity"] == "high"
         assert isinstance(d["diagnostic_steps"], list)

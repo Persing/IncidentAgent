@@ -9,7 +9,7 @@ Hybrid mode (default) combines:
   2. BM25 keyword     — exact and near-exact term matching over chunk text
 
 The two result lists are fused using Reciprocal Rank Fusion (RRF), which
-combines ranked lists without requiring score normalisation.
+combines ranked lists without requiring score normalization.
 
 Why hybrid outperforms semantic-only on this corpus:
   - Incident alerts often contain exact technical identifiers
@@ -62,7 +62,7 @@ class RunbookMatch:
     bm25_rank: int | None      # rank in the BM25 results (None if not found)
     family: str
     severity: str
-    source: str             # file path to the runbook markdown
+    source: str             # file path to the runbook Markdown
 
 
 # ── Retriever ─────────────────────────────────────────────────────────────────
@@ -293,17 +293,13 @@ class RunbookRetriever:
         semantic_rank_map = {rb: i + 1 for i, (rb, _) in enumerate(semantic_ranked)}
         bm25_rank_map = {rb: i + 1 for i, (rb, _) in enumerate(bm25_ranked)}
 
-        # Source metadata comes from whichever signal found the runbook.
-        # Build a lookup: runbook → source path.
         source_map: dict[str, str] = {}
         family_map: dict[str, str] = {}
         severity_map: dict[str, str] = {}
-        for doc, _ in self._vectorstore.similarity_search_with_score("", k=1):
-            pass  # warm up; real lookup below
 
-        # Get metadata for all runbooks in the result set from the BM25 index
-        # (BM25Index keeps RunbookChunk objects with all metadata)
-        for chunk in self._bm25._chunks:
+        # Metadata comes from the BM25 index — it holds RunbookChunk objects
+        # with source path, family, and severity for every chunk in the corpus.
+        for chunk in self._bm25.chunks:
             rb = chunk.runbook_name
             if rb not in source_map:
                 source_map[rb] = chunk.source_path

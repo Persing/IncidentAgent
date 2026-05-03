@@ -20,14 +20,14 @@ better recall than either alone, especially on technical incident text where
 alert names and metric labels are exact strings that matter.
 
 Tokenizer design:
-  Standard word tokenisers split on whitespace and punctuation. That works
+  Standard word tokenizers split on whitespace and punctuation. That works
   poorly for infrastructure text where meaning is packed into compound forms:
     CrashLoopBackOff    → crash loop back off
     kube-proxy          → kube proxy
     container_cpu_usage → container cpu usage
     text-embedding-3-small → text embedding 3 small
 
-  The tokeniser here splits camelCase, hyphens, underscores, and other
+  The tokenizer here splits camelCase, hyphens, underscores, and other
   punctuation, then lowercases. This makes "CrashLoopBackOff" in an alert
   match "crashloopbackoff" in a runbook and vice versa.
 """
@@ -155,6 +155,10 @@ class BM25Index:
             for i, score in ranked
         ]
 
+    @property
+    def chunks(self):
+        return self._chunks
+
 
 # ── Reciprocal Rank Fusion ───────────────────────────────────────────────────
 
@@ -167,7 +171,7 @@ def reciprocal_rank_fusion(
     Combine multiple ranked lists of runbook names using Reciprocal Rank Fusion.
 
     RRF is the standard method for combining heterogeneous retrieval signals
-    without needing to normalise their score scales. It only cares about rank
+    without needing to normalize their score scales. It only cares about rank
     position, not raw score values. This makes it robust when combining BM25
     (unbounded, corpus-dependent scale) with cosine/L2 distance (bounded scale).
 
@@ -175,7 +179,7 @@ def reciprocal_rank_fusion(
     where rank is 1-indexed and k=60 is the standard smoothing constant.
 
     A document that does not appear in a list is simply not scored for that list
-    — it is not penalised. Documents that appear high in multiple lists get
+    — it is not penalized. Documents that appear high in multiple lists get
     the highest combined scores.
 
     Args:

@@ -75,7 +75,7 @@ class TestBM25IndexFromDir:
 
     def test_empty_directory_raises(self, tmp_path):
         # BM25Okapi requires at least one document; an empty corpus causes
-        # a ZeroDivisionError inside the library. Document this behaviour.
+        # a ZeroDivisionError inside the library. Document this behavior.
         empty_dir = tmp_path / "empty"
         empty_dir.mkdir()
         with pytest.raises(ZeroDivisionError):

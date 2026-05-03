@@ -3,8 +3,6 @@
 
 """Unit tests for the BM25 tokenizer."""
 
-import pytest
-
 from src.retrieval.bm25_index import tokenize
 
 

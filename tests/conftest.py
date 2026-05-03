@@ -5,13 +5,13 @@
 Shared fixtures for the IncidentAgent test suite.
 
 All fixtures that mock external dependencies (LLM, embeddings, ChromaDB)
-live here so individual test modules stay focused on behaviour.
+live here so individual test modules stay focused on behavior.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -50,7 +50,7 @@ def test_settings(tmp_path):
     get_settings.cache_clear()
 
 
-# ── Minimal runbook markdown ──────────────────────────────────────────────────
+# ── Minimal runbook Markdown ──────────────────────────────────────────────────
 
 
 MINIMAL_RUNBOOK = """\

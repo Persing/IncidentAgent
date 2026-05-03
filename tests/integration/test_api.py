@@ -11,15 +11,12 @@ objects directly into app.state.
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
 from src.api.main import app
-from src.agent.classify import ClassificationResult, IncidentFamily
-from src.agent.prompts import Confidence, Severity, TriagePlan
-from src.retrieval.retriever import RunbookMatch
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -38,11 +35,11 @@ def _make_triage_state(plan, matches, classification=None):
 @pytest.fixture
 def mock_graph(sample_triage_plan, sample_matches, sample_classification):
     graph = MagicMock()
-    graph.invoke.return_value = _make_triage_state(
+    graph.ainvoke = AsyncMock(return_value=_make_triage_state(
         plan=sample_triage_plan,
         matches=sample_matches,
         classification=sample_classification,
-    )
+    ))
     return graph
 
 
@@ -192,7 +189,7 @@ class TestTriageEndpoint:
         assert response.status_code == 422
 
     def test_agent_error_returns_503(self, api_client, mock_graph):
-        mock_graph.invoke.side_effect = RuntimeError("LLM unreachable")
+        mock_graph.ainvoke.side_effect = RuntimeError("LLM unreachable")
         response = api_client.post(
             "/triage", json={"query": "Pod is crash looping in ml-serving namespace"}
         )

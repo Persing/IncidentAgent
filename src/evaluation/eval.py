@@ -16,7 +16,7 @@ Metrics:
 
     MRR       — Mean Reciprocal Rank. For each case, take 1/rank of the
                 first correct result, then average across all cases.
-                Penalises cases where the right answer is buried at rank 5
+                Penalizes cases where the right answer is buried at rank 5
                 vs. rank 1. A perfect retriever has MRR=1.0.
 
 Both metrics are computed against primary_runbook only (the single most
@@ -429,7 +429,7 @@ if __name__ == "__main__":
     if args.output:
         out_path = Path(args.output)
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        # Convert dataclasses to dicts for JSON serialisation
+        # Convert dataclasses to dicts for JSON serialization
         report_dict = asdict(report)
         with open(out_path, "w") as f:
             json.dump(report_dict, f, indent=2, default=str)
