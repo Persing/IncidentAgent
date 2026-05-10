@@ -59,17 +59,17 @@ class TestBM25IndexSearch:
 class TestBM25IndexFromDir:
     def test_from_runbooks_dir(self, runbooks_dir):
         index = BM25Index.from_runbooks_dir(str(runbooks_dir))
-        assert len(index._chunks) > 0
+        assert len(index.chunks) > 0
 
     def test_chunk_count_matches_sections(self, runbooks_dir):
         index = BM25Index.from_runbooks_dir(str(runbooks_dir))
         # Two runbooks, each has title + overview + diagnostic steps (3 sections each = 6 total)
         # Tags section is excluded, so fewer than raw section count
-        assert len(index._chunks) >= 4
+        assert len(index.chunks) >= 4
 
     def test_families_populated(self, runbooks_dir):
         index = BM25Index.from_runbooks_dir(str(runbooks_dir))
-        families = {c.family for c in index._chunks}
+        families = {c.family for c in index.chunks}
         assert "compute" in families
         assert "networking" in families
 

@@ -244,7 +244,7 @@ def run_eval(
         family_filter = None
         if classify_chain is not None:
             try:
-                result = classify_chain.invoke({"query": query})
+                result = classify_chain.invoke({"query": query}, config=run_config)
                 if result.infrastructure_signals:
                     signals_text = " ".join(result.infrastructure_signals)
                     bm25_query = f"{query} {signals_text}"
@@ -345,11 +345,7 @@ def _aggregate(
         by_category[cat] = _subset_stats(subset, max_k)
 
     return EvalReport(
-        timestamp=(
-            datetime.datetime.fromtimestamp(time.time(), tz=datetime.timezone.utc)
-            .replace(tzinfo=None)
-            .isoformat(timespec="microseconds")
-        ),
+        timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         embedding_provider=settings.embedding_provider,
         embedding_model=settings.active_embedding_model,
         fetch_k=FETCH_K,

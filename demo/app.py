@@ -13,7 +13,6 @@ Then run this from the project root:
 from __future__ import annotations
 
 import logging
-
 import os
 
 import requests
@@ -21,7 +20,7 @@ import streamlit as st
 
 from src.config.logging_config import configure_logging
 
-configure_logging("DEBUG")
+configure_logging("INFO")
 logger = logging.getLogger(__name__)
 
 API_BASE = os.environ.get("API_BASE", "http://localhost:8000")

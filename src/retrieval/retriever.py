@@ -232,13 +232,13 @@ class RunbookRetriever:
             logger.warning("family-filtered semantic search failed (%s) — skipping", exc)
             return []
 
-        best: dict[str, tuple[float, dict]] = {}
+        best: dict[str, float] = {}
         for doc, score in raw:
             rb = doc.metadata["runbook"]
-            if rb not in best or score < best[rb][0]:
-                best[rb] = (score, doc.metadata)
+            if rb not in best or score < best[rb]:
+                best[rb] = score
 
-        return sorted(best.items(), key=lambda x: x[1][0])
+        return sorted(best.items(), key=lambda x: x[1])
 
     def _semantic_search(
         self, query: str, fetch_k: int
@@ -252,13 +252,13 @@ class RunbookRetriever:
         raw = self._vectorstore.similarity_search_with_score(query, k=fetch_k)
 
         # Keep best (lowest distance) chunk per runbook
-        best: dict[str, tuple[float, dict]] = {}
+        best: dict[str, float] = {}
         for doc, score in raw:
             rb = doc.metadata["runbook"]
-            if rb not in best or score < best[rb][0]:
-                best[rb] = (score, doc.metadata)
+            if rb not in best or score < best[rb]:
+                best[rb] = score
 
-        return sorted(best.items(), key=lambda x: x[1][0])
+        return sorted(best.items(), key=lambda x: x[1])
 
     def _bm25_search(
         self, query: str, fetch_k: int

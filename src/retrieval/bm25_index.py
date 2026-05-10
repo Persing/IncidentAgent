@@ -40,7 +40,7 @@ from pathlib import Path
 
 from rank_bm25 import BM25Okapi
 
-from src.ingestion.loader import RunbookChunk, _parse_runbook
+from src.ingestion.loader import RunbookChunk, parse_runbook
 
 
 # ── Tokenizer ────────────────────────────────────────────────────────────────
@@ -115,7 +115,7 @@ class BM25Index:
         """
         chunks: list[RunbookChunk] = []
         for path in sorted(Path(runbooks_dir).glob("*.md")):
-            chunks.extend(_parse_runbook(path))
+            chunks.extend(parse_runbook(path))
         return cls(chunks)
 
     def search(self, query: str, k: int = 20) -> list[BM25Result]:

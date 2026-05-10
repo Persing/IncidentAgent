@@ -38,6 +38,7 @@ from typing import Iterator
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
+from src.config.logging_config import configure_logging
 from src.config.settings import Settings, get_settings
 from src.providers.embeddings import get_embedding_provider
 
@@ -167,7 +168,7 @@ def _split_by_sections(markdown: str) -> list[tuple[str, str]]:
     return sections
 
 
-def _parse_runbook(path: Path) -> Iterator[RunbookChunk]:
+def parse_runbook(path: Path) -> Iterator[RunbookChunk]:
     """
     Parse a single runbook Markdown file into RunbookChunk objects.
 
@@ -236,7 +237,7 @@ def ingest_runbooks(settings: Settings | None = None) -> IngestionStats:
     # Build the full list of chunks across all runbooks
     all_chunks: list[RunbookChunk] = []
     for path in runbook_files:
-        chunks = list(_parse_runbook(path))
+        chunks = list(parse_runbook(path))
         if not chunks:
             stats.errors.append(f"No chunks produced from {path.name}")
             continue
@@ -279,11 +280,7 @@ def ingest_runbooks(settings: Settings | None = None) -> IngestionStats:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s",
-        datefmt="%H:%M:%S",
-    )
+    configure_logging("INFO")
 
     print("Starting runbook ingestion...\n")
     result = ingest_runbooks()

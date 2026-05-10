@@ -33,8 +33,6 @@ from __future__ import annotations
 import logging
 import time
 from enum import Enum
-from typing import List, Optional
-
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
@@ -67,7 +65,7 @@ class ClassificationResult(BaseModel):
     for both BM25 and semantic search when this classification is present.
     """
 
-    families: List[IncidentFamily] = Field(
+    families: list[IncidentFamily] = Field(
         description=(
             "One or more incident families this alert most likely belongs to. "
             "Use COMPUTE for pod/container/node issues, STORAGE for disk/PVC/etcd, "
@@ -79,7 +77,7 @@ class ClassificationResult(BaseModel):
             "Include multiple families if the alert spans more than one layer."
         )
     )
-    infrastructure_signals: List[str] = Field(
+    infrastructure_signals: list[str] = Field(
         description=(
             "Specific infrastructure terms and Kubernetes concepts implied by the "
             "alert, even if not stated explicitly. Examples: 'CrashLoopBackOff', "
@@ -107,7 +105,7 @@ class ClassificationResult(BaseModel):
             "there are truly no infrastructure signals to work with."
         )
     )
-    clarification_question: Optional[str] = Field(
+    clarification_question: str | None = Field(
         default=None,
         description=(
             "If needs_clarification is True: one specific question whose answer "

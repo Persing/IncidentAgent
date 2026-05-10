@@ -7,6 +7,12 @@ services:
     build: .
     command: python -m src.ingestion.loader
     env_file: .env
+    environment:
+      CHROMA_PERSIST_DIR: /app/data/chroma_db
+      # host.docker.internal is the correct address for reaching Ollama on the
+      # host machine from inside a container. If OLLAMA_BASE_URL is set in .env,
+      # that value takes precedence; otherwise this default is used.
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
     volumes:
       - chroma_data:/app/data/chroma_db
     restart: "no"
@@ -20,6 +26,7 @@ services:
     env_file: .env
     environment:
       CHROMA_PERSIST_DIR: /app/data/chroma_db
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
     volumes:
       - chroma_data:/app/data/chroma_db
     depends_on:

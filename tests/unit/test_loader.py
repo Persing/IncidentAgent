@@ -8,7 +8,7 @@ from __future__ import annotations
 from src.ingestion.loader import (
     IngestionStats,
     RunbookChunk,
-    _parse_runbook,
+    parse_runbook,
     _parse_tags,
     _split_by_sections,
 )
@@ -135,36 +135,36 @@ class TestRunbookChunk:
         assert "kubectl logs" in doc.page_content
 
 
-# ── _parse_runbook ────────────────────────────────────────────────────────────
+# ── parse_runbook ────────────────────────────────────────────────────────────
 
 
 class TestParseRunbook:
     def test_yields_chunks(self, runbook_file):
-        chunks = list(_parse_runbook(runbook_file))
+        chunks = list(parse_runbook(runbook_file))
         assert len(chunks) >= 1
 
     def test_chunk_inherits_tags(self, runbook_file):
-        chunks = list(_parse_runbook(runbook_file))
+        chunks = list(parse_runbook(runbook_file))
         for chunk in chunks:
             assert chunk.family == "compute"
             assert chunk.severity == "high"
 
     def test_tags_section_not_yielded(self, runbook_file):
-        chunks = list(_parse_runbook(runbook_file))
+        chunks = list(parse_runbook(runbook_file))
         section_names = [c.section_name for c in chunks]
         assert "Tags" not in section_names
 
     def test_source_path_set(self, runbook_file):
-        chunks = list(_parse_runbook(runbook_file))
+        chunks = list(parse_runbook(runbook_file))
         assert all(c.source_path == str(runbook_file) for c in chunks)
 
     def test_runbook_name_is_stem(self, runbook_file):
-        chunks = list(_parse_runbook(runbook_file))
+        chunks = list(parse_runbook(runbook_file))
         assert all(c.runbook_name == "compute-crashloop" for c in chunks)
 
     def test_missing_file_yields_nothing(self, tmp_path):
         missing = tmp_path / "does-not-exist.md"
-        chunks = list(_parse_runbook(missing))
+        chunks = list(parse_runbook(missing))
         assert chunks == []
 
 

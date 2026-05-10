@@ -40,6 +40,7 @@ from typing import Optional, TypedDict
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from src.agent.classify import ClassificationResult, make_classify_node
 from src.agent.prompts import TRIAGE_PROMPT, TriagePlan, format_runbook_context
@@ -181,7 +182,7 @@ def make_generate_node(settings: Settings):
 # ── Graph assembly ───────────────────────────────────────────────────────────
 
 
-def build_graph(settings: Settings | None = None) -> StateGraph:
+def build_graph(settings: Settings | None = None) -> CompiledStateGraph:
     """
     Assemble and compile the triage LangGraph.
 

@@ -17,8 +17,6 @@ from __future__ import annotations
 import re
 from enum import Enum
 from pathlib import Path
-from typing import List
-
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 
@@ -68,13 +66,13 @@ class TriagePlan(BaseModel):
             "Be specific. If uncertain, state the two most likely causes."
         )
     )
-    affected_components: List[str] = Field(
+    affected_components: list[str] = Field(
         description=(
             "Services, systems, or infrastructure components likely involved. "
             "Include both the directly affected component and any likely dependencies."
         )
     )
-    diagnostic_steps: List[str] = Field(
+    diagnostic_steps: list[str] = Field(
         description=(
             "Ordered list of diagnostic steps as plain strings — do not include "
             "numbers or bullet prefixes. Step 1 should be the fastest check "
@@ -82,7 +80,7 @@ class TriagePlan(BaseModel):
             "commands, metric names, or dashboard links where the runbooks provide them."
         )
     )
-    resolution_steps: List[str] = Field(
+    resolution_steps: list[str] = Field(
         description=(
             "Ordered list of resolution steps as plain strings — do not include "
             "numbers or bullet prefixes. Use conditional form where the cause "
@@ -90,13 +88,13 @@ class TriagePlan(BaseModel):
             "Include the rollback path if a recent deploy is a possible cause."
         )
     )
-    escalation_criteria: List[str] = Field(
+    escalation_criteria: list[str] = Field(
         description=(
             "Specific conditions that mean this incident is beyond the scope of "
             "this runbook and requires escalating to a senior engineer or another team."
         )
     )
-    runbooks_referenced: List[str] = Field(
+    runbooks_referenced: list[str] = Field(
         description=(
             "Exact names of the runbooks (without .md extension) that informed "
             "this triage plan. Only list runbooks that were actually used."
