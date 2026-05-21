@@ -11,8 +11,8 @@ is provider-agnostic.
 
 Supported providers:
   openai      — OpenAI text-embedding-3-small (or configured model)
-  ollama      — Any Ollama-hosted model (default: nomic-embed-text)
-  huggingface — Local sentence-transformers model (default: BAAI/bge-small-en-v1.5)
+  ollama      — Any Ollama-hosted model (default: all-minilm)
+  huggingface — Local sentence-transformers model (default: sentence-transformers/all-MiniLM-L6-v2)
 
 Provider packages are imported lazily so you only need the package for
 the provider you actually use. Install via:

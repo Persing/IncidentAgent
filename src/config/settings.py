@@ -53,11 +53,11 @@ class Settings(BaseSettings):
 
     # ── Ollama ───────────────────────────────────────────────
     ollama_base_url: str = "http://localhost:11434"
-    ollama_embedding_model: str = "nomic-embed-text"
+    ollama_embedding_model: str = "all-minilm"
     ollama_llm_model: str = "llama3.1"
 
     # ── HuggingFace / local sentence-transformers ─────────────
-    hf_embedding_model: str = "BAAI/bge-small-en-v1.5"
+    hf_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 
     # ── ChromaDB ─────────────────────────────────────────────
     chroma_persist_dir: str = "data/chroma_db"

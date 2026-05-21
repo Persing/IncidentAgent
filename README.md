@@ -54,7 +54,7 @@ Phase 2 is complete and working end-to-end:
 | Provider abstraction               | ✅      | OpenAI / Anthropic / Ollama — swap via `.env`                                  |
 | Triage agent                       | ✅      | LangGraph three-node graph (classify → retrieve → generate), structured output |
 | Eval harness                       | ✅      | Recall@k and MRR across 24 labeled test cases                                  |
-| Hybrid retrieval (BM25 + semantic) | ✅      | RRF fusion, Recall@5 0.917→0.958, MRR 0.802→0.889                              |
+| Hybrid retrieval (BM25 + semantic) | ✅      | RRF fusion, Recall@5 0.917→1.000, MRR 0.802→0.958. Embedding: all-MiniLM-L6-v2 |
 | FastAPI layer                      | ✅      | `POST /triage`, `GET /health`, `GET /runbooks`                                 |
 | LangSmith tracing                  | ✅      | Per-request metadata, provider tags, eval separation                           |
 | LangGraph classify node            | ✅      | Phase 2 graph: classify → retrieve → generate. Recall@5 1.000, MRR 0.931       |
@@ -63,30 +63,46 @@ Phase 2 is complete and working end-to-end:
 
 ## Retrieval eval results
 
-24 labeled test cases across 4 difficulty categories (direct, semantic, multi-runbook, confusable).
-Three-stage progression: semantic-only baseline → hybrid (BM25 + semantic) → runbook content improvement:
+### Curated corpus — 24 labeled test cases
+
+Four-stage progression: semantic-only baseline → hybrid (BM25 + semantic) → runbook content improvement → embedding model upgrade (nomic → MiniLM):
 
 ```
-                Baseline   Hybrid   Phase 2   Delta (total)
-Recall@1         0.708     0.833    0.875      +0.167
-Recall@3         0.875     0.958    1.000      +0.125
-Recall@5         0.917     0.958    1.000      +0.083
-MRR              0.802     0.889    0.931      +0.129
-Avg latency       49ms      96ms     50ms
+                Baseline   Hybrid   Phase 2   MiniLM    Delta (total)
+Recall@1         0.708     0.833    0.875     0.917      +0.209
+Recall@3         0.875     0.958    1.000     1.000      +0.125
+Recall@5         0.917     0.958    1.000     1.000      +0.083
+MRR              0.802     0.889    0.931     0.958      +0.156
+Avg latency       49ms      96ms     30ms      45ms
 ```
 
-**By category (Phase 2 — no misses):**
+**By category (MiniLM — no misses):**
 
-| Category      | n | Recall@5 | MRR   | Notes                                                      |
-|---------------|---|----------|-------|------------------------------------------------------------|
-| direct        | 5 | 1.000    | 1.000 | Explicit alert names / metric labels                       |
-| multi_runbook | 6 | 1.000    | 0.917 | Co-triggered incidents, multiple expected runbooks         |
-| confusable    | 7 | 1.000    | 0.833 | Similar-sounding alerts, different correct runbook         |
+| Category      | n | Recall@5 | MRR   | Notes                                                       |
+|---------------|---|----------|-------|-------------------------------------------------------------|
+| direct        | 5 | 1.000    | 1.000 | Explicit alert names / metric labels                        |
+| multi_runbook | 6 | 1.000    | 0.917 | Co-triggered incidents, multiple expected runbooks          |
+| confusable    | 7 | 1.000    | 0.833 | Similar-sounding alerts, different correct runbook          |
 | semantic      | 6 | 1.000    | 1.000 | User-language descriptions, no k8s terminology ← was 0.833 |
 
-**How Phase 2 eliminated the last miss** (`tc_005` — "Scoring service unresponsive, health checks timing out"):
+### External corpus — 37 test cases (prometheus-operator runbooks)
 
-The root cause was a vocabulary gap: the plain-language alert had zero semantic overlap with the compute-crashloop runbook, which only described the Kubernetes alert perspective (`CrashLoopBackOff`, `restartCount`). Both BM25 and semantic search failed to surface it.
+The curated corpus was designed alongside the runbooks and reflects IncidentAgent's tag schema. To measure generalization, the same retrieval systems were run against 37 prometheus-operator alert names mapped to public runbooks — a harder and more honest test (test cases auto-generated from alert names, runbooks not written for this schema):
+
+```
+System                              Recall@1   Recall@5   MRR    Latency
+IA Hybrid — nomic-embed-text          0.378      0.784    0.549    59ms
+Aurora (Weaviate hybrid, MiniLM)      0.460      0.838    0.631    29ms
+IA Hybrid — all-MiniLM-L6-v2         0.568      0.865    0.682    32ms
+```
+
+IA Hybrid with MiniLM beats Aurora on both metrics — MRR 0.682 vs 0.631, Recall@5 0.865 vs 0.838. The BM25 component earns its keep here: prometheus-operator alert names (`KubePodCrashLooping`, `etcdHighFsyncDurations`, `KubeAPIDown`) are precise technical identifiers that exact keyword matching handles decisively, while semantic-only systems struggle with the vocabulary gap.
+
+The corpus quality gap is the larger story: all systems drop substantially when moving from curated to external (0.958 → 0.682 MRR). This is expected and honest — the external runbooks weren't written with IncidentAgent's vocabulary, and the test cases were auto-generated rather than hand-labeled. The right fix for a production deployment is a richer, tagged runbook corpus — not a better retrieval algorithm.
+
+### How Phase 2 eliminated the last curated miss
+
+`tc_005` — "Scoring service unresponsive, health checks timing out": the plain-language alert had zero semantic overlap with the compute-crashloop runbook, which only described the Kubernetes alert perspective (`CrashLoopBackOff`, `restartCount`). Both BM25 and semantic search failed to surface it.
 
 The fix was a runbook content improvement: the Overview section now explicitly describes the user-facing presentation — "service completely unresponsive, health checks time out, pod does not accept connections, 503 errors from load balancer". Semantic search immediately found it at rank 1.
 
@@ -152,7 +168,7 @@ Edit `.env`. Minimum required fields depend on your provider choice:
 ```env
 EMBEDDING_PROVIDER=ollama
 LLM_PROVIDER=ollama
-OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+OLLAMA_EMBEDDING_MODEL=all-minilm
 OLLAMA_LLM_MODEL=mistral-small3.2  # or any model you have pulled
 ```
 
@@ -174,7 +190,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 ### Pull Ollama models (if using Ollama)
 
 ```bash
-ollama pull nomic-embed-text    # embeddings — 274MB
+ollama pull all-minilm           # embeddings — 46MB
 ollama pull mistral-small3.2    # LLM — 15GB, best quality locally
 # or:
 ollama pull llama3              # smaller (4.7GB), less reliable on structured output
@@ -198,7 +214,8 @@ Chunks skipped     : 0
 ### Verify retrieval quality
 
 ```bash
-python -m src.evaluation.eval
+make eval
+# or: python -m src.evaluation.eval
 ```
 
 Runs 24 labeled test cases through the retriever only (no LLM, completes in ~1s). Prints Recall@k and MRR. Save results for comparison:
@@ -210,8 +227,8 @@ python -m src.evaluation.eval --output results/eval_$(date +%Y%m%d).json
 To also test the classify node's vocabulary augmentation (adds one LLM call per test case, ~3–5 minutes total):
 
 ```bash
-python -m src.evaluation.eval --classify
-python -m src.evaluation.eval --classify --output results/eval_classify_$(date +%Y%m%d).json
+make eval-classify
+# or: python -m src.evaluation.eval --classify
 ```
 
 ### Run the agent (Python)
@@ -261,7 +278,7 @@ curl http://localhost:8000/health
 {
   "status": "ok",
   "embedding_provider": "ollama",
-  "embedding_model": "nomic-embed-text",
+  "embedding_model": "all-minilm",
   "llm_provider": "ollama",
   "llm_model": "mistral-small3.2:24b",
   "runbooks_indexed": 28
@@ -412,11 +429,12 @@ The **Ownership** section is non-standard and intentional. It documents which te
 2. ~~**FastAPI layer**~~ ✅ — `POST /triage`, `GET /health`, `GET /runbooks`. Graph warms at startup via lifespan.
 3. ~~**LangSmith tracing**~~ ✅ — Per-request metadata, provider tags, eval/production trace separation.
 4. ~~**LangGraph classify node**~~ ✅ — `classify → retrieve → generate`. Translates plain-language alerts to infrastructure vocabulary. Recall@5 1.000, MRR 0.931.
+5. ~~**Embedding model upgrade (nomic → MiniLM)**~~ ✅ — all-MiniLM-L6-v2 default. Curated corpus: MRR 0.931 → 0.958, Recall@1 0.875 → 0.917. External corpus (prometheus-operator, 37 cases): MRR 0.682, Recall@5 0.865 — beats Aurora (Weaviate hybrid, MiniLM).
 
 ### Next
 
-5. **Eval for generation quality** — build a small labeled set of (alert, expected_triage_plan) pairs and score LLM output quality (severity accuracy, step completeness, escalation criteria).
-6. **Clarifying-question node** — conditional `classify → clarify → retrieve → generate` path for truly ambiguous alerts where even the classify node outputs `needs_clarification=True`.
+6. **Eval for generation quality** — build a small labeled set of (alert, expected_triage_plan) pairs and score LLM output quality (severity accuracy, step completeness, escalation criteria).
+7. **Clarifying-question node** — conditional `classify → clarify → retrieve → generate` path for truly ambiguous alerts where even the classify node outputs `needs_clarification=True`.
 
 ---
 
