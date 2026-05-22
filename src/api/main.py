@@ -25,6 +25,7 @@ Example request:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 import time
@@ -42,6 +43,7 @@ from src.agent.triage_agent import build_graph, run_triage_full_async
 from src.config.logging_config import configure_logging
 from src.config.settings import Settings, get_settings
 from src.config.tracing import build_run_config
+from src.plugins.base import TriageResult
 from src.retrieval.retriever import RunbookMatch
 
 logger = logging.getLogger(__name__)
@@ -132,8 +134,15 @@ async def lifespan(api_app: FastAPI):
         logger.error("Failed to build triage graph at startup: %s", e)
         raise
 
+    # Load and cache alert + output plugins (trigger self-registration on import)
+    import src.plugins.alerts.webhook  # noqa: F401
+    import src.plugins.outputs.webhook  # noqa: F401
+    from src.plugins.registry import registry as plugin_registry
+
     api_app.state.graph = graph
     api_app.state.settings = settings
+    api_app.state.alert_plugin = plugin_registry.get_alert(settings.alert_plugin)()
+    api_app.state.output_plugin = plugin_registry.get_output(settings.output_plugin)()
 
     logger.info("Triage agent ready.")
     yield
@@ -201,29 +210,33 @@ async def triage(request_body: TriageRequest, response: Response) -> TriageRespo
     """
     settings: Settings = app.state.settings
     graph = app.state.graph
+    alert_plugin = app.state.alert_plugin
+    output_plugin = app.state.output_plugin
 
     request_id = str(uuid.uuid4())
     t0 = time.perf_counter()
+
+    normalized = alert_plugin.normalize(request_body.model_dump())
 
     run_config = build_run_config(
         settings=settings,
         tags=["api"],
         metadata={
             "request_id": request_id,
-            "query_preview": request_body.query[:120],
-            "return_k": request_body.return_k,
+            "query_preview": normalized.raw_text[:120],
+            "return_k": normalized.return_k,
         },
     )
 
     try:
         state = await run_triage_full_async(
-            query=request_body.query,
-            return_k=request_body.return_k,
+            query=normalized.raw_text,
+            return_k=normalized.return_k,
             graph=graph,
             run_config=run_config,
         )
     except Exception:
-        logger.exception("Triage failed request_id=%s query=%r", request_id, request_body.query[:80])
+        logger.exception("Triage failed request_id=%s query=%r", request_id, normalized.raw_text[:80])
         raise HTTPException(
             status_code=503,
             detail=f"Triage agent unavailable. Reference ID: {request_id}",
@@ -244,6 +257,15 @@ async def triage(request_body: TriageRequest, response: Response) -> TriageRespo
     # Add headers for easy monitoring/correlation without parsing the body
     response.headers["X-Latency-Ms"] = str(latency_ms)
     response.headers["X-Request-Id"] = request_id
+
+    triage_result = TriageResult(
+        alert=normalized,
+        plan=plan,
+        matches=matches,
+        latency_ms=latency_ms,
+        request_id=request_id,
+    )
+    asyncio.create_task(output_plugin.deliver(triage_result, settings.output_plugin_config))
 
     return TriageResponse(
         plan=plan,
