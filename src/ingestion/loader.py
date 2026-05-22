@@ -218,36 +218,27 @@ def ingest_runbooks(settings: Settings | None = None) -> IngestionStats:
         settings = get_settings()
 
     stats = IngestionStats()
-    runbooks_dir = Path(settings.runbooks_dir)
 
-    if not runbooks_dir.exists():
+    # Trigger plugin self-registration, then delegate document fetching
+    import src.plugins.sources.local_file  # noqa: F401
+    from src.plugins.registry import registry as plugin_registry
+
+    source_cls = plugin_registry.get_source(settings.source_plugin)
+    source = source_cls()
+    source_config = {"runbooks_dir": settings.runbooks_dir, **settings.source_plugin_config}
+
+    try:
+        all_chunks = source.fetch_documents(source_config)
+    except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Runbooks directory not found: {runbooks_dir}. "
-            "Make sure you're running from the project root."
-        )
-
-    # Collect all runbook files
-    runbook_files = sorted(runbooks_dir.glob("*.md"))
-    if not runbook_files:
-        logger.warning("No .md files found in %s", runbooks_dir)
-        return stats
-
-    logger.info("Found %d runbook files in %s", len(runbook_files), runbooks_dir)
-
-    # Build the full list of chunks across all runbooks
-    all_chunks: list[RunbookChunk] = []
-    for path in runbook_files:
-        chunks = list(parse_runbook(path))
-        if not chunks:
-            stats.errors.append(f"No chunks produced from {path.name}")
-            continue
-        all_chunks.extend(chunks)
-        stats.runbooks_processed += 1
-        logger.debug("Parsed %s → %d chunks", path.name, len(chunks))
+            f"{exc} Make sure you're running from the project root."
+        ) from exc
 
     if not all_chunks:
         logger.error("No chunks produced. Aborting ingestion.")
         return stats
+
+    stats.runbooks_processed = len({c.runbook_name for c in all_chunks})
 
     logger.info(
         "Parsed %d runbooks into %d chunks. Embedding and storing...",

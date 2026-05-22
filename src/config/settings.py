@@ -77,6 +77,26 @@ class Settings(BaseSettings):
     langchain_api_key: str = Field(default="", repr=False)
     langchain_project: str = "incident-triage-agent"
 
+    # ── Plugin selection ──────────────────────────────────────
+    source_plugin: str = Field(
+        default="local_file",
+        description="Name of the SourcePlugin to use for runbook ingestion.",
+    )
+    alert_plugin: str = Field(
+        default="webhook",
+        description="Name of the AlertPlugin to use for normalizing inbound alerts.",
+    )
+    output_plugin: str = Field(
+        default="webhook",
+        description="Name of the OutputPlugin to use for delivering triage results.",
+    )
+
+    # Per-plugin config dicts — populated from JSON-encoded env vars.
+    # e.g. SOURCE_PLUGIN_CONFIG='{"runbooks_dir": "data/runbooks"}'
+    source_plugin_config: dict = Field(default_factory=dict)
+    alert_plugin_config: dict = Field(default_factory=dict)
+    output_plugin_config: dict = Field(default_factory=dict)
+
     @property
     def active_embedding_model(self) -> str:
         if self.embedding_provider == "openai":
